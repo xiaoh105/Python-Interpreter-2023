@@ -1,5 +1,6 @@
 // 你不可以修改这份代码
 #pragma once
+
 #include <any>
 
 struct visitor;
