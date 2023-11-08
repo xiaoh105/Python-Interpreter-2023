@@ -33,12 +33,12 @@ comp_op: '<'|'>'|'=='|'>='|'<=' | '!=';
 arith_expr: term (addorsub_op term)*;
 addorsub_op: '+'|'-';
 term: factor (muldivmod_op factor)*;
-muldivmod_op: '*'|'/'|'//'|'%';
+muldivmod_op: '*'|'/'|'//'|'%'; // 乘除模符号
 factor: ('+'|'-') factor | atom_expr;
 atom_expr: atom trailer?;
 trailer: '(' (arglist)? ')' ;
 atom: (NAME | NUMBER | STRING+| 'None' | 'True' | 'False' | ('(' test ')'));
-testlist: test (',' test)* (',')?;//算式  eg： a,b   a   a+b
+testlist: test (',' test)* (',')?; // 算式  eg： a,b   a   a+b
 arglist: argument (',' argument)*  (',')?;
 argument: ( test |
             test '=' test );
