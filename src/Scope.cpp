@@ -1,25 +1,29 @@
 #include <cassert>
+#include "BuiltinFuncs.h"
 #include "Scope.h"
+#include "Evalvisitor.h"
+#include <VarOperator.h>
 
-VarScope::VarScope(const std::vector<std::pair<std::string, std::any>> &val)
+#define DEBUG
+
+AtomVarScope::AtomVarScope(const std::vector<std::pair<std::string, std::any>> &val)
 {
   var.clear();
   for (const auto &i: val) RegisterVar(i.first, i.second);
 }
 
-void VarScope::RegisterVar(const std::string &name,const std::any &val)
-
+void AtomVarScope::RegisterVar(const std::string &name, const std::any &val)
 {
   if (var_id.find(name) != var_id.end()) assert(false);
   var_id[name] = var.size();
   var.push_back(val);
 }
 
-std::pair<bool, std::any *> VarScope::QueryVar(const std::string &name)
+std::pair<bool, std::any> AtomVarScope::QueryVar(const std::string &name)
 {
   if (var_id.find(name) == var_id.end())
   {
-    return std::make_pair(false, nullptr);
+    return std::make_pair(false, std::any(name));
   }
   else
   {
@@ -27,54 +31,129 @@ std::pair<bool, std::any *> VarScope::QueryVar(const std::string &name)
   }
 }
 
-Scope::Scope(): global(), scope_id(), func_scope()
+Scope::Scope(): global()
 {
-  for (int i = 1; i <= python_consts::kMAX_FUNC; ++i) status.insert(i);
+  func_scope.push(&global);
 }
 
-void Scope::RegisterScope
-(int id, const std::vector<std::pair<std::string, std::any>> &val)
+void Scope::RegisterScope()
 {
-  if (status.empty()) assert(false);
-  int pos = *status.begin();
-  status.erase(status.begin());
-  func_scope[pos] = new VarScope(val);
-  scope_id[id] = pos;
+  func_scope.push(new AtomVarScope);
 }
 
-void Scope::DestroyScope(int id)
+void Scope::DestroyScope()
 {
-  int pos = scope_id[id];
-  status.insert(pos);
-  delete func_scope[pos];
-  func_scope[pos] = nullptr;
-  scope_id.erase(id);
+  delete func_scope.top();
+  func_scope.pop();
 }
 
-void Scope::RegisterVar(int id, const std::string &name, const std::any &val)
+void Scope::RegisterVar(const std::string &name, const std::any &val)
 {
-  if (id == -1)
+  func_scope.top()->RegisterVar(name, val);
+}
+
+std::pair<bool, std::any> Scope::QueryVar(const std::string &name)
+{
+  auto ret = func_scope.top()->QueryVar(name);
+  if (ret.first) { return ret; }
+  else { return global.QueryVar(name); }
+}
+
+std::any AtomFuncScope::CallFunc
+(Python3Parser::ArglistContext *arglist)
+{
+  var_scope.RegisterScope();
+  EvalVisitor visitor;
+  for (const auto &i: var) var_scope.RegisterVar(i.first, i.second);
+  GetArglist(arglist);
+  for (const auto &i: var)
+    if (!var_scope.QueryVar(i.first).first)
+    {
+      if (!i.second.has_value()) assert(false);
+      var_scope.RegisterVar(i.first, i.second);
+    }
+  std::any ret = visitor.visit(body);
+  var_scope.DestroyScope();
+  return ret;
+}
+
+void AtomFuncScope::GetArglist(Python3Parser::ArglistContext *ctx)
+{
+  if (ctx == nullptr) return;
+  int num = -1;
+  for (const auto &i:ctx->argument())
   {
-    global.RegisterVar(name, val);
-  }
-  else
-  {
-    int pos = scope_id[id];
-    func_scope[pos]->RegisterVar(name, val);
+    ++num;
+    EvalVisitor visitor;
+    if (!i->ASSIGN())
+    {
+      auto tmp = visitor.visitTest(i->test()[0]);
+      ToRightVal(tmp);
+      auto tmp_var = var_scope.QueryVar(var[num].first).second;
+      auto cur_var  = std::any_cast<std::any*>(tmp_var);
+      *cur_var = tmp;
+    }
+    else
+    {
+      auto tmp0 = visitor.visitTest(i->test()[0]);
+      auto tmp1 = visitor.visitTest(i->test()[1]);
+      if (GetVar(tmp1))
+      {
+        tmp1 = *std::any_cast<std::any*>(tmp1);
+      }
+      if (!GetVar(tmp0)) assert(false);
+      auto cur_var = std::any_cast<std::pair<bool, std::any>>(tmp0).second;
+      *std::any_cast<std::any*>(cur_var) = tmp1;
+    }
   }
 }
 
-std::pair<bool, std::any *> Scope::QueryVar(int id, const std::string &name)
+std::any FuncScope::CallBuiltinFunc
+        (const std::string &name,
+         Python3Parser::ArglistContext *arglist)
 {
-  if (id == -1)
+  EvalVisitor visitor;
+  std::vector<std::pair<std::string, std::any>> args;
+  for (const auto &i: arglist->argument())
+    args.emplace_back("", visitor.visitArgument(i));
+  if (name == "print")
   {
-    return global.QueryVar(name);
+    Print(args);
+    return std::any();
   }
-  else
+  else if (name == "int")
   {
-    int pos = scope_id[id];
-    auto ret = func_scope[pos]->QueryVar(name);
-    if (ret.first) { return ret; }
-    else { return global.QueryVar(name); }
+    return ToInt(args[0].second);
   }
+  else if (name == "float")
+  {
+    return ToFloat(args[0].second);
+  }
+  else if (name == "str")
+  {
+    return ToString(args[0].second);
+  }
+  else if (name == "bool")
+  {
+    return ToBool(args[0].second);
+  }
+  else { assert(false); }
+}
+
+void FuncScope::DefFunc
+(const std::string &name,
+ const std::vector<std::pair<std::string, std::any>> &def_arglist,
+ Python3Parser::SuiteContext *ctx)
+{
+  func_id[name] = ++num_of_func;
+  func_scope[num_of_func] = new AtomFuncScope(ctx, def_arglist);
+}
+
+std::any FuncScope::CallFunc
+(const std::string &name,
+ Python3Parser::ArglistContext *arglist)
+{
+  if (IsBuiltin(name)) return CallBuiltinFunc(name, arglist);
+  if (!func_id[name]) assert(false);
+  return func_scope[func_id[name]]->CallFunc(arglist);
 }

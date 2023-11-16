@@ -22,7 +22,10 @@ add_executable(code ${main_src}
 				src/Constant.h
         src/Scope.cpp
         src/Scope.h
-				src/VarOperator.cpp) # Add all *.cpp file after src/main.cpp, like src/Evalvisitor.cpp did
+				src/VarOperator.cpp
+        src/BuiltinFuncs.cpp
+        src/Utils.cpp
+) # Add all *.cpp file after src/main.cpp, like src/Evalvisitor.cpp did
 
 ### YOU CAN'T MODIFY THE CODE BELOW
 target_link_libraries(code PyAntlr)

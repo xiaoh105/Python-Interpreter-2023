@@ -59,41 +59,41 @@ public:
   antlr4::atn::SerializedATNView getSerializedATN() const override;
 
 
-  class File_inputContext;
-  class FuncdefContext;
-  class ParametersContext;
-  class TypedargslistContext;
-  class TfpdefContext;
-  class StmtContext;
-  class Simple_stmtContext;
-  class Small_stmtContext;
-  class Expr_stmtContext;
-  class AugassignContext;
+  class File_inputContext; // Completed - No override
+  class FuncdefContext; // Completed
+  class ParametersContext; // Completed - No visit
+  class TypedargslistContext; // Completed
+  class TfpdefContext; // Completed - No visit
+  class StmtContext; // Completed - No override
+  class Simple_stmtContext; // Completed - No override
+  class Small_stmtContext; // Completed - No override
+  class Expr_stmtContext; // Completed
+  class AugassignContext; // Completed
   class Flow_stmtContext;
   class Break_stmtContext;
   class Continue_stmtContext;
   class Return_stmtContext;
-  class Compound_stmtContext;
+  class Compound_stmtContext; // Completed - No override
   class If_stmtContext;
   class While_stmtContext;
   class SuiteContext;
-  class TestContext;
-  class Or_testContext;
-  class And_testContext;
-  class Not_testContext;
+  class TestContext; // Completed - No override
+  class Or_testContext; // Completed
+  class And_testContext; // Completed
+  class Not_testContext; // Completed
   class ComparisonContext;
-  class Comp_opContext;
-  class Arith_exprContext;
-  class Addorsub_opContext;
-  class TermContext;
-  class Muldivmod_opContext;
-  class FactorContext;
-  class Atom_exprContext;
-  class TrailerContext;
-  class AtomContext;
-  class TestlistContext;
-  class ArglistContext;
-  class ArgumentContext; 
+  class Comp_opContext; // Completed
+  class Arith_exprContext; // Completed
+  class Addorsub_opContext; // Completed
+  class TermContext; // Completed
+  class Muldivmod_opContext; // Completed
+  class FactorContext; // Completed
+  class Atom_exprContext; // Completed
+  class TrailerContext; // Completed
+  class AtomContext; // Completed
+  class TestlistContext; // Completed
+  class ArglistContext; // Completed
+  class ArgumentContext; // Completed
 
   class  File_inputContext : public antlr4::ParserRuleContext {
   public:
