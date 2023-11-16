@@ -324,11 +324,3 @@ std::any operator|(const std::any &x, const std::any &y)
 {
   return !x? y:x;
 }
-
-std::any GetIndex(const std::any &x, int id)
-{
-  if (GetType(x) != python_consts::TUPLE) assert(false);
-  auto val = std::any_cast<std::vector<std::any>>(x);
-  if (id >= val.size()) assert(false);
-  return val[id];
-}

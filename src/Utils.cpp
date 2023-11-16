@@ -92,3 +92,21 @@ std::any* GetVarAddr(const std::any &x)
   auto tmp = std::any_cast<std::pair<bool, std::any>>(x).second;
   return std::any_cast<std::any*>(tmp);
 }
+
+bool GetFlow(const std::any &x)
+{
+  return x.type() == typeid(std::pair<python_consts::kflow_info, std::any>);
+}
+
+python_consts::kflow_info GetFlowInfo(const std::any &x)
+{
+  if (!GetFlow(x)) assert(false);
+  auto tmp = std::any_cast<std::pair<python_consts::kflow_info, std::any>>(x);
+  return tmp.first;
+}
+
+void DelQuotationMark(std::string &s)
+{
+  s.erase(s.length() - 1);
+  s.erase(0, 1);
+}

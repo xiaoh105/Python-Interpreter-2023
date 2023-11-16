@@ -68,7 +68,7 @@ std::any AtomFuncScope::CallFunc
   for (const auto &i: var) cur_scope->RegisterVar(i.first, i.second);
   GetArglist(arglist, *cur_scope);
   var_scope.func_scope.push(cur_scope);
-  std::any ret = visitor.visit(body);
+  std::any ret = visitor.visitSuite(body);
   var_scope.DestroyScope();
   return ret;
 }
@@ -109,8 +109,9 @@ std::any FuncScope::CallBuiltinFunc
 {
   EvalVisitor visitor;
   std::vector<std::pair<std::string, std::any>> args;
-  for (const auto &i: arglist->argument())
-    args.emplace_back("", visitor.visitArgument(i));
+  if (arglist)
+    for (const auto &i: arglist->argument())
+      args.emplace_back("", visitor.visitArgument(i));
   if (name == "print")
   {
     Print(args);
@@ -150,5 +151,7 @@ std::any FuncScope::CallFunc
 {
   if (IsBuiltin(name)) return CallBuiltinFunc(name, arglist);
   if (!func_id[name]) assert(false);
-  return func_scope[func_id[name]]->CallFunc(arglist);
+  auto ret =  func_scope[func_id[name]]->CallFunc(arglist);
+  return std::any_cast<std::pair<python_consts::kflow_info, std::any>>
+         (ret).second;
 }

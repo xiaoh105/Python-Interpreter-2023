@@ -11,5 +11,6 @@ namespace python_consts
   enum kcomp_op{ LE, GE, LEQ, GEQ, EQ, NEQ };
   enum kaug_assign{ ADDASSIGN, SUBASSIGN, MULASSIGN,
                     DIVASSIGN, IDIVASSIGN, MODASSIGN};
+  enum kflow_info{ BREAK, CONTINUE, RETURN, END };
 }
 #endif //PYTHON_INTERPRETER_CONSTANT_H

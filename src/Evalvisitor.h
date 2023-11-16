@@ -27,6 +27,19 @@ class EvalVisitor : public Python3ParserBaseVisitor
   virtual std::any visitAugassign(Python3Parser::AugassignContext *ctx) override;
   virtual std::any visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx) override;
   virtual std::any visitComparison(Python3Parser::ComparisonContext *ctx) override;
+  virtual std::any visitBreak_stmt(Python3Parser::Break_stmtContext *ctx) override;
+  virtual std::any visitContinue_stmt(Python3Parser::Continue_stmtContext *ctx) override;
+  virtual std::any visitReturn_stmt(Python3Parser::Return_stmtContext *ctx) override;
+  virtual std::any visitSuite(Python3Parser::SuiteContext *ctx) override;
+  virtual std::any visitIf_stmt(Python3Parser::If_stmtContext *ctx) override;
+  virtual std::any visitWhile_stmt(Python3Parser::While_stmtContext *ctx) override;
+
+  virtual std::any visitStmt(Python3Parser::StmtContext *ctx) override;
+  virtual std::any visitSimple_stmt(Python3Parser::Simple_stmtContext *ctx) override;
+  virtual std::any visitSmall_stmt(Python3Parser::Small_stmtContext *ctx) override;
+  virtual std::any visitFlow_stmt(Python3Parser::Flow_stmtContext *ctx) override;
+  virtual std::any visitCompound_stmt(Python3Parser::Compound_stmtContext *ctx) override;
+  virtual std::any visitTest(Python3Parser::TestContext *ctx) override;
 };
 
 

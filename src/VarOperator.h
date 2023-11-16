@@ -54,6 +54,4 @@ std::any operator&(const std::any &x, const std::any &y);
 
 std::any operator|(const std::any &x, const std::any &y);
 
-std::any GetIndex(const std::any &, int);
-
 #endif //PYTHON_INTERPRETER_VAROPERATOR_H
