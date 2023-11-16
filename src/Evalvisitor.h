@@ -26,6 +26,7 @@ class EvalVisitor : public Python3ParserBaseVisitor
   virtual std::any visitOr_test(Python3Parser::Or_testContext *ctx) override;
   virtual std::any visitAugassign(Python3Parser::AugassignContext *ctx) override;
   virtual std::any visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx) override;
+  virtual std::any visitComparison(Python3Parser::ComparisonContext *ctx) override;
 };
 
 

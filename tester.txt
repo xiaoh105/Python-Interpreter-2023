@@ -1,0 +1,13 @@
+#!/bin/bash
+for i in {0..7}
+do
+   ./cmake-build-debug/code < "testcases/basic-testcases/test$i.in" > "ans.txt"
+   diff -b -Z "testcases/basic-testcases/test$i.out" "ans.txt"
+   if [ $? -eq 0 ]
+   then
+       echo "Test $i:Files are the same"
+   else
+       echo "Test $i:Difference occurs"
+       read -n1 -s
+   fi
+done

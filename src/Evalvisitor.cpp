@@ -24,6 +24,7 @@ std::any EvalVisitor::visitAtom(Python3Parser::AtomContext *ctx)
   {
     std::string ret;
     for (const auto &i: ctx->STRING()) ret += i->getText();
+    // TODO: Delete " and " in getText()
     return ret;
   }
   else if (ctx->test()) { return visit(ctx->test()); }
@@ -286,5 +287,31 @@ std::any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx)
     }
     return val;
   }
+}
+
+std::any EvalVisitor::visitComparison(Python3Parser::ComparisonContext *ctx)
+{
+  std::any lhs = visitArith_expr(ctx->arith_expr()[0]);
+  if (ctx->arith_expr().size() == 1) return lhs;
+  for (int i = 1; i < ctx->arith_expr().size(); ++i)
+  {
+    std::any rhs = visitArith_expr(ctx->arith_expr()[i]);
+    int op = std::any_cast<python_consts::kcomp_op>
+            (visitComp_op(ctx->comp_op()[i - 1]));
+    bool ret;
+    switch (op)
+    {
+      case python_consts::LE: ret = (lhs < rhs); break;
+      case python_consts::LEQ: ret = (lhs <= rhs); break;
+      case python_consts::GE: ret = (lhs > rhs); break;
+      case python_consts::GEQ: ret = (lhs >= rhs); break;
+      case python_consts::EQ: ret = (lhs == rhs); break;
+      case python_consts::NEQ: ret = (lhs != rhs); break;
+      default: assert(false);
+    }
+    if (!ret) return false;
+    lhs = rhs;
+  }
+  return true;
 }
 

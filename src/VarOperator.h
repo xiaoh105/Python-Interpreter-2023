@@ -46,6 +46,8 @@ bool operator<=(const std::any &x, const std::any &y);
 
 bool operator>=(const std::any &x, const std::any &y);
 
+bool operator!=(const std::any &x, const std::any &y);
+
 bool operator!(const std::any &x);
 
 std::any operator&(const std::any &x, const std::any &y);
