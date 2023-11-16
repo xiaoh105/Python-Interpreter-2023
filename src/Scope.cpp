@@ -36,9 +36,10 @@ Scope::Scope(): global()
   func_scope.push(&global);
 }
 
-void Scope::RegisterScope()
+AtomVarScope* Scope::RegisterScope()
 {
-  func_scope.push(new AtomVarScope);
+  auto tmp = new AtomVarScope;
+  return tmp;
 }
 
 void Scope::DestroyScope()
@@ -62,22 +63,18 @@ std::pair<bool, std::any> Scope::QueryVar(const std::string &name)
 std::any AtomFuncScope::CallFunc
 (Python3Parser::ArglistContext *arglist)
 {
-  var_scope.RegisterScope();
+  auto cur_scope = var_scope.RegisterScope();
   EvalVisitor visitor;
-  for (const auto &i: var) var_scope.RegisterVar(i.first, i.second);
-  GetArglist(arglist);
-  for (const auto &i: var)
-    if (!var_scope.QueryVar(i.first).first)
-    {
-      if (!i.second.has_value()) assert(false);
-      var_scope.RegisterVar(i.first, i.second);
-    }
+  for (const auto &i: var) cur_scope->RegisterVar(i.first, i.second);
+  GetArglist(arglist, *cur_scope);
+  var_scope.func_scope.push(cur_scope);
   std::any ret = visitor.visit(body);
   var_scope.DestroyScope();
   return ret;
 }
 
-void AtomFuncScope::GetArglist(Python3Parser::ArglistContext *ctx)
+void AtomFuncScope::GetArglist(Python3Parser::ArglistContext *ctx,
+                               AtomVarScope &cur_scope)
 {
   if (ctx == nullptr) return;
   int num = -1;
@@ -89,21 +86,19 @@ void AtomFuncScope::GetArglist(Python3Parser::ArglistContext *ctx)
     {
       auto tmp = visitor.visitTest(i->test()[0]);
       ToRightVal(tmp);
-      auto tmp_var = var_scope.QueryVar(var[num].first).second;
+      auto tmp_var = cur_scope.QueryVar(var[num].first).second;
       auto cur_var  = std::any_cast<std::any*>(tmp_var);
       *cur_var = tmp;
     }
     else
     {
+      var_scope.func_scope.push(&cur_scope);
       auto tmp0 = visitor.visitTest(i->test()[0]);
+      var_scope.func_scope.pop();
       auto tmp1 = visitor.visitTest(i->test()[1]);
-      if (GetVar(tmp1))
-      {
-        tmp1 = *std::any_cast<std::any*>(tmp1);
-      }
+      ToRightVal(tmp1);
       if (!GetVar(tmp0)) assert(false);
-      auto cur_var = std::any_cast<std::pair<bool, std::any>>(tmp0).second;
-      *std::any_cast<std::any*>(cur_var) = tmp1;
+      *GetVarAddr(tmp0) = tmp1;
     }
   }
 }

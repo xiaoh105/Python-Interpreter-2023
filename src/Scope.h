@@ -28,6 +28,7 @@ class AtomVarScope
 class Scope
 {
  private:
+  friend class AtomFuncScope;
   AtomVarScope global;
   std::stack<AtomVarScope *> func_scope;
 
@@ -35,7 +36,7 @@ class Scope
   Scope();
   ~Scope() = default;
   /// Register a variable scope
-  void RegisterScope();
+  static AtomVarScope *RegisterScope();
   void DestroyScope();
   /// Register a variable in a certain scope, -1 for global variable
   void RegisterVar(const std::string &, const std::any &);
@@ -48,7 +49,8 @@ class AtomFuncScope
  private:
   Python3Parser::SuiteContext *body;
   std::vector<std::pair<std::string, std::any>> var;
-  void GetArglist(Python3Parser::ArglistContext *ctx);
+  void GetArglist(Python3Parser::ArglistContext *ctx,
+                  AtomVarScope &);
 
  public:
   AtomFuncScope(Python3Parser::SuiteContext *ctx,

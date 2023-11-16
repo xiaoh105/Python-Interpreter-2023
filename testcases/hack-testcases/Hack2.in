@@ -1,0 +1,7 @@
+a = b, c = d = e, f = 1, 2
+print(a)
+print(b)
+print(c)
+print(d)
+print(e)
+print(f)
