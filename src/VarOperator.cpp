@@ -18,6 +18,7 @@ void ToRightVal(std::any &x)
   {
     auto val = std::any_cast<std::vector<std::any>>(x);
     for (auto &i: val) ToRightVal(i);
+    x = val;
   }
 }
 

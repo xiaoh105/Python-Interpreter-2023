@@ -1,5 +1,6 @@
 #include <iostream>
 #include <int2048.h>
+#include <cassert>
 
 sjtu::polynomial::polynomial()
 {

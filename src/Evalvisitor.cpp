@@ -184,7 +184,11 @@ std::any EvalVisitor::visitTestlist(Python3Parser::TestlistContext *ctx)
   if (ctx->test().size() > 1)
   {
     std::vector<std::any> ret;
-    for (const auto &i: ctx->test()) ret.push_back(visitTest(i));
+    for (const auto &i: ctx->test())
+    {
+      auto tmp = visitTest(i);
+      ret.push_back(tmp);
+    }
     return ret;
   }
   else

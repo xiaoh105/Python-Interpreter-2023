@@ -4,8 +4,6 @@
 #include "Evalvisitor.h"
 #include <VarOperator.h>
 
-#define DEBUG
-
 AtomVarScope::AtomVarScope(const std::vector<std::pair<std::string, std::any>> &val)
 {
   var.clear();
