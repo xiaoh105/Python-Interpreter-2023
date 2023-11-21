@@ -318,10 +318,12 @@ bool operator!(const std::any &x)
 
 std::any operator&(const std::any &x, const std::any &y)
 {
-  return !x? x:y;
+  if (!ToBool(x) || !ToBool(y)) { return false; }
+  else { return true; }
 }
 
 std::any operator|(const std::any &x, const std::any &y)
 {
-  return !x? y:x;
+  if (ToBool(x) || ToBool(y)) { return true; }
+  else { return false; }
 }
