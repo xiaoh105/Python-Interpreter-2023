@@ -368,14 +368,12 @@ bool sjtu::operator>(const sjtu::int2048 &x, const sjtu::int2048 &y)
 
 bool sjtu::operator<=(const sjtu::int2048 &x, const sjtu::int2048 &y)
 {
-  if (x > y) { return false; }
-  else { return true; }
+  return !(x > y);
 }
 
 bool sjtu::operator>=(const sjtu::int2048 &x, const sjtu::int2048 &y)
 {
-  if (x < y) { return false; }
-  else { return true; }
+  return !(x < y);
 }
 
 sjtu::int2048 sjtu::UnsignedAdd(const sjtu::int2048 &x, const sjtu::int2048 &y)
@@ -478,8 +476,7 @@ sjtu::int2048 sjtu::add(sjtu::int2048 x, const sjtu::int2048 &y)
 
 sjtu::int2048 &sjtu::int2048::minus(const sjtu::int2048 &val)
 {
-  add(-val);
-  return *this;
+  return add(-val);
 }
 
 sjtu::int2048 sjtu::minus(sjtu::int2048 x, const sjtu::int2048 &y)
@@ -489,33 +486,36 @@ sjtu::int2048 sjtu::minus(sjtu::int2048 x, const sjtu::int2048 &y)
 
 sjtu::int2048 &sjtu::int2048::operator+=(const sjtu::int2048 &val)
 {
-  add(val);
-  return *this;
+  return add(val);
 }
 
 sjtu::int2048 sjtu::operator+(sjtu::int2048 x, const sjtu::int2048 &y)
 {
-  x.add(y);
-  return x;
+  return x.add(y);
 }
 
 sjtu::int2048 &sjtu::int2048::operator-=(const sjtu::int2048 &x)
 {
-  minus(x);
-  return *this;
+  return minus(x);
 }
 
 sjtu::int2048 sjtu::operator-(sjtu::int2048 x, const sjtu::int2048 &y)
 {
-  x.minus(y);
-  return x;
+  return x.minus(y);
+}
+
+sjtu::int2048 &sjtu::int2048::UnsignedMul(const int2048 &val)
+{
+  sjtu::polynomial x(*this), y(val);
+  *this = x.Multiply(y).ToInteger();
+  sgn = 1;
+  return *this;
 }
 
 sjtu::int2048 &sjtu::int2048::operator*=(const sjtu::int2048 &val)
 {
-  sjtu::polynomial x(*this), y(val);
   int sgn_tmp = sgn * val.sgn;
-  *this = x.Multiply(y).ToInteger();
+  UnsignedMul(val);
   sgn = sgn_tmp;
   if (len == 1 && a[0] == 0) sgn = 1;
   return *this;
@@ -523,34 +523,28 @@ sjtu::int2048 &sjtu::int2048::operator*=(const sjtu::int2048 &val)
 
 sjtu::int2048 sjtu::operator*(sjtu::int2048 x, const sjtu::int2048 &y)
 {
-  x *= y;
-  return x;
+  return x *= y;
 }
 
-sjtu::int2048 sjtu::operator*(sjtu::int2048 x, long long y)
-{
+sjtu::int2048 sjtu::operator*(sjtu::int2048 x, long long y) {
   if (y >= static_cast<long long>(1e12)) return x * int2048(y);
-  if (y < 0)
-  {
+  if (y < 0) {
     x.sgn *= -1;
     y = std::abs(y);
   }
-  auto *tmp = new long long [x.len + 20];
-  for (int i = 0; i < x.len; ++i) tmp[i] = 1ll * x.a[i] * y;
-  for (int i = 1; i < x.len; ++i)
+  long long carry = 0;
+  for (int i = 0; i < x.len; ++i)
   {
-    tmp[i] += tmp[i - 1] / sjtu::int2048::base;
-    tmp[i - 1] %= sjtu::int2048::base;
+    carry += x.a[i] * y;
+    x.a[i] = carry % sjtu::int2048::base;
+    carry /= sjtu::int2048::base;
   }
-  while (tmp[x.len - 1] >= sjtu::int2048::base)
+  while (carry)
   {
-    tmp[x.len] = tmp[x.len - 1] / sjtu::int2048::base;
-    tmp[x.len - 1] %= sjtu::int2048::base;
+    x.a.push_back(carry % sjtu::int2048::base);
+    carry /= sjtu::int2048::base;
     ++x.len;
   }
-  x.a.resize(x.len);
-  for (int i = 0; i < x.len; ++i) x.a[i] = static_cast<int>(tmp[i]);
-  delete [] tmp;
   return x;
 }
 
@@ -583,8 +577,8 @@ sjtu::int2048 sjtu::GetInv(const sjtu::int2048 &val, int len)
   }
   int k = (len + 2) >> 1;
   sjtu::int2048 ans = GetInv(val, k);
-  ans = ((2 * ans) << (len - k)) -
-        (((val >> (val.len - len)) * ans * ans) >> (2 * k));
+  ans = UnsignedMinus(((2 * ans) << (len - k)),
+        (((val >> (val.len - len)).UnsignedMul(ans).UnsignedMul(ans)) >> (2 * k)));
   return ans;
 }
 
@@ -611,7 +605,7 @@ sjtu::int2048 &sjtu::int2048::UnsignedShortDivide(const sjtu::int2048 &val)
       }
       if ((l + 1) * tmp <= remainder) ++l;
       ans.a[i] = l;
-      remainder = remainder - l * tmp;
+      remainder = UnsignedMinus(remainder, l * tmp);
     }
   }
   while (ans.len >= 2 && ans.a.back() == 0) ans.a.pop_back(), --ans.len;
@@ -631,7 +625,7 @@ sjtu::int2048 &sjtu::int2048::UnsignedDivide(const sjtu::int2048 &val)
   }
   int2048 inv(GetInv(divisor, divisor.len));
   Adjust(int2048(1) << (2 * divisor.len), divisor, inv, 1e8);
-  int2048 ans = (*this * inv) >> (2 * divisor.len);
+  int2048 ans = (inv.UnsignedMul(*this)) >> (2 * divisor.len);
   Adjust(*this, divisor, ans, 1e4);
   return *this = ans;
 }
@@ -645,26 +639,23 @@ sjtu::int2048 &sjtu::int2048::operator/=(const sjtu::int2048 &val)
   if (val.len > 20) UnsignedDivide(val);
   else UnsignedShortDivide(val);
   sgn = new_sgn;
-  if (*this < 0 && dividend - *this * val != 0) *this -= 1;
+  if (*this < 0 && dividend.minus(*this * val) != 0) *this -= 1;
   if (len == 1 && a[0] == 0) sgn = 1;
   return *this;
 }
 
 sjtu::int2048 sjtu::operator/(sjtu::int2048 x, const sjtu::int2048& y)
 {
-  x /= y;
-  return x;
+  return x /= y;
 }
 
 sjtu::int2048 &sjtu::int2048::operator%=(const sjtu::int2048 &val)
 {
-  int2048 &&res = *this / val;
-  *this -= res * val;
-  return *this;
+  int2048 res = *this / val;
+  return *this = UnsignedMinus(*this, res * val);
 }
 
 sjtu::int2048 sjtu::operator%(sjtu::int2048 x, const sjtu::int2048 &y)
 {
-  x %= y;
-  return x;
+  return x %= y;
 }

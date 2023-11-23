@@ -143,10 +143,10 @@ std::any EvalVisitor::visitTerm(Python3Parser::TermContext *ctx)
             (visitMuldivmod_op(muldivmod_op[i - 1]));
     switch (op)
     {
-      case python_consts::MUL: ret = ret * tmp; break;
-      case python_consts::DIV: ret = ret / tmp; break;
+      case python_consts::MUL: ret *= tmp; break;
+      case python_consts::DIV: ret /= tmp; break;
       case python_consts::IDIV: ret = IDiv(ret, tmp); break;
-      case python_consts::MOD: ret = ret % tmp; break;
+      case python_consts::MOD: ret %= tmp; break;
       default: assert(false);
     }
   }
@@ -172,8 +172,8 @@ std::any EvalVisitor::visitArith_expr(Python3Parser::Arith_exprContext *ctx)
             (visitAddorsub_op(addorsub_op[i - 1]));
     switch (op)
     {
-      case python_consts::ADD: ret = ret + tmp; break;
-      case python_consts::MINUS: ret = ret - tmp; break;
+      case python_consts::ADD: ret += tmp; break;
+      case python_consts::MINUS: ret -= tmp; break;
       default: assert(false);
     }
   }

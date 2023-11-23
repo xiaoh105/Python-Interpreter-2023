@@ -79,7 +79,7 @@ std::any operator+(const std::any &a, const std::any &b)
     if (x.type() != y.type()) assert(false);
     auto s1 = *std::any_cast<std::string>(&x);
     auto s2 = *std::any_cast<std::string>(&y);
-    return s1 + s2;
+    return s1 += s2;
   }
   else
   {
@@ -91,7 +91,7 @@ std::any operator+(const std::any &a, const std::any &b)
     }
     else
     {
-      return ToInt(x) + ToInt(y);
+      return ToInt(x).add(ToInt(y));
     }
   }
 }
@@ -114,7 +114,7 @@ std::any operator-(const std::any &a, const std::any &b)
     }
     else
     {
-      return ToInt(x) - ToInt(y);
+      return ToInt(x).minus(ToInt(y));
     }
   }
 }
@@ -143,8 +143,7 @@ std::any operator*(const std::any &a, const std::any &b)
   }
   else
   {
-    python_consts::ktype type_x, type_y;
-    type_x = GetType(x), type_y = GetType(y);
+    auto type_x = GetType(x), type_y = GetType(y);
     if (std::min(type_x, type_y) == python_consts::FLOAT)
     {
       return ToFloat(x) * ToFloat(y);
@@ -308,8 +307,7 @@ bool operator!=(const std::any &x, const std::any &y)
 
 bool operator!(const std::any &x)
 {
-  auto val = ToBool(x);
-  return !val;
+  return !ToBool(x);
 }
 
 std::any operator&(const std::any &x, const std::any &y)

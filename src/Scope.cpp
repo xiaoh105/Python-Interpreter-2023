@@ -80,20 +80,21 @@ void AtomFuncScope::GetArglist(Python3Parser::ArglistContext *ctx,
   {
     ++num;
     EvalVisitor visitor;
+    auto test = i->test();
     if (!i->ASSIGN())
     {
-      auto tmp = visitor.visitTest(i->test()[0]);
+      auto tmp = visitor.visitTest(test[0]);
       ToRightVal(tmp);
       auto tmp_var = cur_scope.QueryVar(var[num].first).second;
-      auto cur_var  = *std::any_cast<std::any*>(&tmp_var);
+      auto cur_var = *std::any_cast<std::any*>(&tmp_var);
       *cur_var = tmp;
     }
     else
     {
       var_scope.func_scope.push(&cur_scope);
-      auto tmp0 = visitor.visitTest(i->test()[0]);
+      auto tmp0 = visitor.visitTest(test[0]);
       var_scope.func_scope.pop();
-      auto tmp1 = visitor.visitTest(i->test()[1]);
+      auto tmp1 = visitor.visitTest(test[1]);
       ToRightVal(tmp1);
       if (!GetVar(tmp0)) assert(false);
       *GetVarAddr(tmp0) = tmp1;
@@ -149,7 +150,7 @@ std::any FuncScope::CallFunc
 {
   if (IsBuiltin(name)) return CallBuiltinFunc(name, arglist);
   if (!func_id[name]) assert(false);
-  auto ret =  func_scope[func_id[name]]->CallFunc(arglist);
+  auto ret = func_scope[func_id[name]]->CallFunc(arglist);
   return std::any_cast<std::pair<python_consts::kflow_info, std::any>>
          (&ret)->second;
 }

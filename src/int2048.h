@@ -68,6 +68,7 @@ namespace sjtu
     friend int2048 UnsignedAdd(const int2048 &, const int2048 &);
     /// 无符号减法
     friend int2048 UnsignedMinus(const int2048 &, const int2048 &);
+    int2048 &UnsignedMul(const int2048 &);
     /// 在牛顿迭代法之后进行误差调整
     friend void Adjust(const int2048 &, const int2048&, int2048 &, long long);
     /// 运用牛顿迭代法求逆，即求[2^n / x]
