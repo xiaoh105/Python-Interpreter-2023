@@ -12,7 +12,11 @@ AtomVarScope::AtomVarScope(const std::vector<std::pair<std::string, std::any>> &
 
 void AtomVarScope::RegisterVar(const std::string &name, const std::any &val)
 {
-  if (var_id.find(name) != var_id.end()) assert(false);
+  if (var_id.find(name) != var_id.end())
+  {
+    std::cerr << "Register a var already exists" << std::endl;
+    assert(false);
+  }
   var_id[name] = var.size();
   var.push_back(val);
 }
