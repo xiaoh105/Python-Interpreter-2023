@@ -35,7 +35,7 @@ sjtu::int2048 ToInt(const std::any &x)
   else
   {
     std::cerr << "Current data can't be converted to int." << std::endl;
-    assert(false);
+    exit(301);
   }
 }
 
@@ -67,7 +67,7 @@ double ToFloat(const std::any &x)
   else
   {
     std::cerr << "Current data can't be converted to float." << std::endl;
-    assert(false);
+    exit(302);
   }
 }
 
@@ -101,7 +101,7 @@ std::string ToString(const std::any &x)
   else
   {
     std::cerr << "Current data can't be converted to string." << std::endl;
-    assert(false);
+    exit(303);
   }
 }
 
@@ -133,7 +133,7 @@ bool ToBool(const std::any &x)
   {
     {
       std::cerr << "Current data can't be converted to bool." << std::endl;
-      assert(false);
+      exit(304);
     }
   }
 }
@@ -164,7 +164,7 @@ void PrintAtom(const std::any &val)
   else if (GetTuple(val))
   {
     std::cerr << "Do not support print() for tuples!" << std::endl;
-    assert(false);
+    exit(305);
     // TODO: delete this/remove assert
     auto x = std::any_cast<std::vector<std::any>>(val);
     for (int i = 0; i < x.size(); ++i)
@@ -176,7 +176,7 @@ void PrintAtom(const std::any &val)
   else
   {
     std::cerr << "Current type doesn't support print()" << std::endl;
-    assert(false);
+    exit(306);
   }
 }
 

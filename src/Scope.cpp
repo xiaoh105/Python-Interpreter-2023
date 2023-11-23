@@ -15,7 +15,7 @@ void AtomVarScope::RegisterVar(const std::string &name, const std::any &val)
   if (var_id.find(name) != var_id.end())
   {
     std::cerr << "Register a var already exists" << std::endl;
-    assert(false);
+    exit(201);
   }
   var_id[name] = var.size();
   var.push_back(val);
@@ -99,7 +99,7 @@ void AtomFuncScope::GetArglist(Python3Parser::ArglistContext *ctx,
       var_scope.func_scope.pop();
       auto tmp1 = visitor.visitTest(i->test()[1]);
       ToRightVal(tmp1);
-      if (!GetVar(tmp0)) assert(false);
+      if (!GetVar(tmp0)) exit(202);
       *GetVarAddr(tmp0) = tmp1;
     }
   }
@@ -135,7 +135,7 @@ std::any FuncScope::CallBuiltinFunc
   {
     return ToBool(args[0].second);
   }
-  else { assert(false); }
+  else { exit(203); }
 }
 
 void FuncScope::DefFunc
@@ -152,7 +152,7 @@ std::any FuncScope::CallFunc
  Python3Parser::ArglistContext *arglist)
 {
   if (IsBuiltin(name)) return CallBuiltinFunc(name, arglist);
-  if (!func_id[name]) assert(false);
+  if (!func_id[name]) exit(204);
   auto ret =  func_scope[func_id[name]]->CallFunc(arglist);
   return std::any_cast<std::pair<python_consts::kflow_info, std::any>>
          (ret).second;
