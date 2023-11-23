@@ -291,7 +291,8 @@ sjtu::int2048 &sjtu::int2048::operator<<=(int val)
 
 sjtu::int2048 &sjtu::int2048::operator>>=(int val)
 {
-  a.resize(len - val); // TODO: if error occurs, check if len-val <= 0
+  if (val >= len) return *this = int2048(0);
+  a.resize(len - val);
   for (int i = val; i < len; ++i) a[i - val] = a[i];
   for (int i = len - val; i < len; ++i) a[i] = 0;
   len -= val;
@@ -589,9 +590,9 @@ sjtu::int2048 sjtu::GetInv(const sjtu::int2048 &val, int len)
 
 sjtu::int2048 &sjtu::int2048::UnsignedShortDivide(const sjtu::int2048 &val)
 {
-  if (val > *this) return *this = 0;
   sgn = 1;
   auto tmp(abs(val));
+  if (val > *this) return *this = 0;
   sjtu::int2048 ans;
   ans.a.resize(len - val.len + 1), ans.len = len - val.len + 1;
   int2048 remainder = *this >> (len - val.len + 1);
@@ -629,7 +630,7 @@ sjtu::int2048 &sjtu::int2048::UnsignedDivide(const sjtu::int2048 &val)
     divisor = (divisor << delta);
   }
   int2048 inv(GetInv(divisor, divisor.len));
-  Adjust(int2048(1) << 2 * divisor.len, divisor, inv, 1e8);
+  Adjust(int2048(1) << (2 * divisor.len), divisor, inv, 1e8);
   int2048 ans = (*this * inv) >> (2 * divisor.len);
   Adjust(*this, divisor, ans, 1e4);
   return *this = ans;
@@ -641,7 +642,8 @@ sjtu::int2048 &sjtu::int2048::operator/=(const sjtu::int2048 &val)
   int2048 dividend = *this;
   int new_sgn = 1;
   if (sgn != val.sgn) new_sgn = -1;
-  UnsignedDivide(val);
+  if (val.len > 20) UnsignedDivide(val);
+  else UnsignedShortDivide(val);
   sgn = new_sgn;
   if (*this < 0 && dividend - *this * val != 0) *this -= 1;
   if (len == 1 && a[0] == 0) sgn = 1;
