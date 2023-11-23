@@ -11,3 +11,15 @@ do
        read -n1 -s
    fi
 done
+for i in {0..19}
+do
+   time ./cmake-build-debug/code < "testcases/bigint-testcases/BigIntegerTest$i.in" > "ans.txt"
+   diff -b -Z "testcases/bigint-testcases/BigIntegerTest$i.out" "ans.txt"
+   if [ $? -eq 0 ]
+   then
+       echo "Test $i:Files are the same"
+   else
+       echo "Test $i:Difference occurs"
+       read -n1 -s
+   fi
+done
