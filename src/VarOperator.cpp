@@ -1,7 +1,6 @@
 #include <vector>
 #include <any>
 #include <cassert>
-#include <exception>
 #include <int2048.h>
 #include <Constant.h>
 #include <BuiltinFuncs.h>
@@ -77,11 +76,7 @@ std::any operator+(const std::any &a, const std::any &b)
   ToRightVal(x), ToRightVal(y);
   if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
   {
-    if (x.type() != y.type())
-    {
-      std::cerr << "Str + Int/Float/Double not supported" << std::endl;
-      assert(false);
-    }
+    if (x.type() != y.type()) assert(false);
     std::string s1, s2;
     s1 = std::any_cast<std::string>(x);
     s2 = std::any_cast<std::string>(y);
@@ -108,7 +103,6 @@ std::any operator-(const std::any &a, const std::any &b)
   ToRightVal(x), ToRightVal(y);
   if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
   {
-    std::cerr <<  "Str do no support op -" << std::endl;
     assert(false);
   }
   else
@@ -132,11 +126,7 @@ std::any operator*(const std::any &a, const std::any &b)
   ToRightVal(x), ToRightVal(y);
   if (GetType(x) == python_consts::STR)
   {
-    if (GetType(y) == python_consts::STR)
-    {
-      std::cerr << "Str * Str not supported" << std::endl;
-      assert(false);
-    }
+    if (GetType(y) == python_consts::STR) assert(false);
     std::string ret, s;
     s = std::any_cast<std::string>(x);
     sjtu::int2048 val = ToInt(y);
@@ -145,11 +135,7 @@ std::any operator*(const std::any &a, const std::any &b)
   }
   else if (GetType(y) == python_consts::STR)
   {
-    if (GetType(x) == python_consts::STR)
-    {
-      std::cerr << "Str * Str not supported" << std::endl;
-      assert(false);
-    }
+    if (GetType(x) == python_consts::STR) assert(false);
     std::string ret, s;
     s = std::any_cast<std::string>(y);
     sjtu::int2048 val = ToInt(x);
@@ -177,7 +163,6 @@ std::any operator/(const std::any &a, const std::any &b)
   ToRightVal(x), ToRightVal(y);
   if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
   {
-    std::cerr << "Str do not support op /" << std::endl;
     assert(false);
   }
   else
@@ -192,7 +177,6 @@ std::any IDiv(const std::any &a, const std::any &b)
   ToRightVal(x), ToRightVal(y);
   if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
   {
-    std::cerr << "Str do not support op //" << std::endl;
     assert(false);
   }
   else
@@ -212,7 +196,6 @@ std::any operator%(const std::any &a, const std::any &b)
   ToRightVal(x), ToRightVal(y);
   if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
   {
-    std::cerr << "Str do not support op %" << std::endl;
     assert(false);
   }
   else
@@ -237,11 +220,7 @@ bool operator<(const std::any &a, const std::any &b)
   ToRightVal(x), ToRightVal(y);
   if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
   {
-    if (GetType(x) != GetType(y))
-    {
-      std::cerr << "Str cmp_op Int/Float/Bool do no support!" << std::endl;
-      assert(false);
-    }
+    if (GetType(x) != GetType(y)) assert(false);
     std::string s1, s2;
     s1 = std::any_cast<std::string>(x);
     s2 = std::any_cast<std::string>(y);
@@ -295,11 +274,7 @@ bool operator>(const std::any &a, const std::any &b)
   ToRightVal(x), ToRightVal(y);
   if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
   {
-    if (GetType(x) != GetType(y))
-    {
-      std::cerr << "Str cmp_op Int/Float/Bool do no support!" << std::endl;
-      assert(false);
-    }
+    if (GetType(x) != GetType(y)) assert(false);
     std::string s1, s2;
     s1 = std::any_cast<std::string>(x);
     s2 = std::any_cast<std::string>(y);

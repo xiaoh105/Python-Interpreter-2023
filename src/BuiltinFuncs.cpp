@@ -145,9 +145,6 @@ void PrintAtom(const std::any &val)
   else if (GetNone(val)) { printf("None"); }
   else if (GetTuple(val))
   {
-    std::cerr << "Do not support print() for tuples!" << std::endl;
-    assert(false);
-    // TODO: delete this/remove assert
     auto x = std::any_cast<std::vector<std::any>>(val);
     for (int i = 0; i < x.size(); ++i)
     {
