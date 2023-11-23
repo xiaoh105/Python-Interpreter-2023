@@ -89,8 +89,8 @@ bool GetVar(const std::any &x)
 std::any* GetVarAddr(const std::any &x)
 {
   if (!GetVar(x)) assert(false);
-  auto tmp = std::any_cast<std::pair<bool, std::any>>(x).second;
-  return std::any_cast<std::any*>(tmp);
+  auto tmp = std::any_cast<std::pair<bool, std::any>>(&x)->second;
+  return *std::any_cast<std::any*>(&tmp);
 }
 
 bool GetFlow(const std::any &x)
@@ -101,7 +101,7 @@ bool GetFlow(const std::any &x)
 python_consts::kflow_info GetFlowInfo(const std::any &x)
 {
   if (!GetFlow(x)) assert(false);
-  auto tmp = std::any_cast<std::pair<python_consts::kflow_info, std::any>>(x);
+  auto tmp = *std::any_cast<std::pair<python_consts::kflow_info, std::any>>(&x);
   return tmp.first;
 }
 

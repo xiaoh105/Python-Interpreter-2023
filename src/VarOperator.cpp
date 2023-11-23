@@ -11,12 +11,12 @@ void ToRightVal(std::any &x)
 {
   if (GetVar(x))
   {
-    auto tmp = std::any_cast<std::pair<bool, std::any>>(x).second;
-    x = *std::any_cast<std::any*>(tmp);
+    auto tmp = std::any_cast<std::pair<bool, std::any>>(&x)->second;
+    x = **std::any_cast<std::any*>(&tmp);
   }
   else if (GetTuple(x))
   {
-    auto val = std::any_cast<std::vector<std::any>>(x);
+    auto val = *std::any_cast<std::vector<std::any>>(&x);
     for (auto &i: val) ToRightVal(i);
     x = val;
   }
@@ -32,7 +32,7 @@ std::any operator+(const std::any &a)
   }
   else if (GetType(x) == python_consts::BOOL)
   {
-    auto val = std::any_cast<bool>(x);
+    auto val = *std::any_cast<bool>(&x);
     return val? sjtu::int2048(1):sjtu::int2048(0);
   }
   else
@@ -51,17 +51,17 @@ std::any operator-(const std::any &a)
   }
   else if (GetType(x) == python_consts::FLOAT)
   {
-    auto val = std::any_cast<double>(x);
+    auto val = *std::any_cast<double>(&x);
     return -val;
   }
   else if (GetType(x) == python_consts::INT)
   {
-    auto val = std::any_cast<sjtu::int2048>(x);
+    auto val = *std::any_cast<sjtu::int2048>(&x);
     return -val;
   }
   else if (GetType(x) == python_consts::BOOL)
   {
-    auto val = std::any_cast<bool>(x);
+    auto val = *std::any_cast<bool>(&x);
     return val? sjtu::int2048(-1):sjtu::int2048(0);
   }
   else
@@ -77,9 +77,8 @@ std::any operator+(const std::any &a, const std::any &b)
   if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
   {
     if (x.type() != y.type()) assert(false);
-    std::string s1, s2;
-    s1 = std::any_cast<std::string>(x);
-    s2 = std::any_cast<std::string>(y);
+    auto s1 = *std::any_cast<std::string>(&x);
+    auto s2 = *std::any_cast<std::string>(&y);
     return s1 + s2;
   }
   else
@@ -128,7 +127,7 @@ std::any operator*(const std::any &a, const std::any &b)
   {
     if (GetType(y) == python_consts::STR) assert(false);
     std::string ret, s;
-    s = std::any_cast<std::string>(x);
+    s = *std::any_cast<std::string>(&x);
     sjtu::int2048 val = ToInt(y);
     for (sjtu::int2048 i = 0; i < val; i += 1) ret += s;
     return ret;
@@ -136,8 +135,8 @@ std::any operator*(const std::any &a, const std::any &b)
   else if (GetType(y) == python_consts::STR)
   {
     if (GetType(x) == python_consts::STR) assert(false);
-    std::string ret, s;
-    s = std::any_cast<std::string>(y);
+    std::string ret;
+    auto s = *std::any_cast<std::string>(&y);
     sjtu::int2048 val = ToInt(x);
     for (sjtu::int2048 i = 0; i < val; i += 1) ret += s;
     return ret;
@@ -221,9 +220,8 @@ bool operator<(const std::any &a, const std::any &b)
   if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
   {
     if (GetType(x) != GetType(y)) assert(false);
-    std::string s1, s2;
-    s1 = std::any_cast<std::string>(x);
-    s2 = std::any_cast<std::string>(y);
+    auto s1 = *std::any_cast<std::string>(&x);
+    auto s2 = *std::any_cast<std::string>(&y);
     return s1 < s2;
   }
   else
@@ -248,9 +246,8 @@ bool operator==(const std::any &a, const std::any &b)
   if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
   {
     if (GetType(x) != GetType(y)) return false;
-    std::string s1, s2;
-    s1 = std::any_cast<std::string>(x);
-    s2 = std::any_cast<std::string>(y);
+    auto s1 = *std::any_cast<std::string>(&x);
+    auto s2 = *std::any_cast<std::string>(&y);
     return s1 == s2;
   }
   else
@@ -275,9 +272,8 @@ bool operator>(const std::any &a, const std::any &b)
   if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
   {
     if (GetType(x) != GetType(y)) assert(false);
-    std::string s1, s2;
-    s1 = std::any_cast<std::string>(x);
-    s2 = std::any_cast<std::string>(y);
+    auto s1 = *std::any_cast<std::string>(&x);
+    auto s2 = *std::any_cast<std::string>(&y);
     return s1 > s2;
   }
   else

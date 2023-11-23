@@ -562,8 +562,7 @@ sjtu::int2048 &sjtu::int2048::add(const sjtu::int2048 &val)
 
 sjtu::int2048 sjtu::add(sjtu::int2048 x, const sjtu::int2048 &y)
 {
-  x.add(y);
-  return x;
+  return x.add(y);
 }
 
 sjtu::int2048 &sjtu::int2048::minus(const sjtu::int2048 &val)
@@ -671,7 +670,7 @@ sjtu::int2048 sjtu::GetInv(const sjtu::int2048 &val, int len)
     return dividend / divisor;
   }
   int k = (len + 2) >> 1;
-  sjtu::int2048 ans= GetInv(val, k);
+  sjtu::int2048 ans = GetInv(val, k);
   ans = ((2 * ans) << (len - k)) -
         (((val >> (val.len - len)) * ans * ans) >> (2 * k));
   return ans;
@@ -716,7 +715,7 @@ sjtu::int2048 sjtu::operator/(sjtu::int2048 x, const sjtu::int2048& y)
 
 sjtu::int2048 &sjtu::int2048::operator%=(const sjtu::int2048 &val)
 {
-  int2048 res = *this / val;
+  int2048 &&res = *this / val;
   *this -= res * val;
   return *this;
 }
