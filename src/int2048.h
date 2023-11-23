@@ -10,6 +10,7 @@
 
 namespace sjtu
 {
+  using std::vector;
   class int2048;
   class polynomial
   {
@@ -19,7 +20,7 @@ namespace sjtu
     constexpr static __int128 inv = 1313549891316395;
     constexpr static __int128 mod = 7881299347898369;
     int len;
-    __int128 *a;
+    vector<__int128> a;
     /// NTT 蝶形变换, O(n)
     void ChangeIndex();
     /// 扩展多项式长度, 自动添加前缀0
@@ -40,17 +41,17 @@ namespace sjtu
     /// 默认构造函数, 默认构造f(x) = 0
     polynomial();
     /// 复制构造函数
-    polynomial(const polynomial &);
+    polynomial(const polynomial &) = default;
     /// 移动构造函数
-    polynomial(polynomial &&) noexcept;
+    polynomial(polynomial &&) = default;
     /// 利用大整数生成多项式，即将x转换为f(x) = a0 + a1 * x + ...
     explicit polynomial(const int2048 &);
     /// 析构函数
-    ~polynomial();
+    ~polynomial() = default;
     /// 复制赋值运算
-    polynomial &operator=(const polynomial &);
+    polynomial &operator=(const polynomial &) = default;
     /// 移动赋值运算
-    polynomial &operator=(polynomial &&) noexcept;
+    polynomial &operator=(polynomial &&) = default;
     /// 进行多项式乘法
     polynomial &Multiply(polynomial);
     /// 利用多项式生成大整数
@@ -62,7 +63,7 @@ namespace sjtu
     const static int base = 10000; // 压位的数字
     const static int base_log10 = 4; // 压位的位数
     int len; // 数字长度，不包含前缀0
-    int *a; // 储存数据，0-based, 低位存在0
+    vector<int> a; // 储存数据，0-based, 低位存在0
     /// 无符号加法
     friend int2048 UnsignedAdd(const int2048 &, const int2048 &);
     /// 无符号减法
@@ -73,6 +74,7 @@ namespace sjtu
     friend int2048 GetInv(const int2048 &, int);
     /// 无符号除法
     int2048 &UnsignedDivide(const int2048 &);
+    int2048 &UnsignedShortDivide(const int2048 &);
     /// 将当前整数*(base^x)（左移一个block)
     int2048 &operator<<=(int);
     /// 将当前整数/(base^x)（右移一个block)
@@ -92,17 +94,17 @@ namespace sjtu
     /// 基于字符串的构造函数
     explicit int2048(const std::string &);
     /// 复制构造函数
-    int2048(const int2048 &);
+    int2048(const int2048 &) = default;
     /// 移动构造函数
-    int2048(int2048 &&) noexcept;
+    int2048(int2048 &&) = default;
     /// 析构函数
-    ~int2048();
+    ~int2048() = default;
 
     /// 读入一个大整数
     void read(const std::string &);
     /// 输出储存的大整数
     void print() const;
-    [[nodiscard]] double ToDouble() const;
+    double ToDouble() const;
 
     /// 返回当前数的绝对值
     friend int2048 abs(const int2048 &);
@@ -123,9 +125,9 @@ namespace sjtu
     int2048 operator-() const;
 
     /// 复制赋值运算
-    int2048 &operator=(const int2048 &);
+    int2048 &operator=(const int2048 &) = default;
     /// 移动赋值运算
-    int2048 &operator=(int2048 &&) noexcept;
+    int2048 &operator=(int2048 &&) noexcept = default;
 
     int2048 &operator+=(const int2048 &);
     friend int2048 operator+(int2048, const int2048 &);
