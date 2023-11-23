@@ -72,9 +72,10 @@ std::any EvalVisitor::visitFuncdef(Python3Parser::FuncdefContext *ctx)
 
 std::any EvalVisitor::visitArgument(Python3Parser::ArgumentContext *ctx)
 {
+  auto test = ctx->test();
   if (ctx->ASSIGN())
   {
-    auto tmp = visitTest(ctx->test()[1]);
+    auto tmp = visitTest(test[1]);
     if (GetVar(tmp))
     {
       tmp = *std::any_cast<std::any*>
@@ -84,7 +85,7 @@ std::any EvalVisitor::visitArgument(Python3Parser::ArgumentContext *ctx)
   }
   else
   {
-    auto tmp = visitTest(ctx->test()[0]);
+    auto tmp = visitTest(test[0]);
     if (GetVar(tmp))
     {
       tmp = *std::any_cast<std::any*>
@@ -97,14 +98,16 @@ std::any EvalVisitor::visitArgument(Python3Parser::ArgumentContext *ctx)
 std::any EvalVisitor::visitTypedargslist(Python3Parser::TypedargslistContext *ctx)
 {
   std::vector<std::pair<std::string, std::any>> ret;
-  int undefined_paras = ctx->tfpdef().size() - ctx->test().size();
-  for (int i = 0; i < ctx->tfpdef().size(); ++i)
+  auto tfpdef = ctx->tfpdef();
+  auto test = ctx->test();
+  int undefined_paras = tfpdef.size() - test.size();
+  for (int i = 0; i < tfpdef.size(); ++i)
   {
-    std::string name = ctx->tfpdef()[i]->NAME()->getText();
+    std::string name = tfpdef[i]->NAME()->getText();
     std::any default_val;
     EvalVisitor visitor;
     if (i >= undefined_paras)
-      default_val = visitor.visitTest(ctx->test()[i - undefined_paras]);
+      default_val = visitor.visitTest(test[i - undefined_paras]);
     ret.emplace_back(name, default_val);
   }
   return ret;
@@ -130,12 +133,14 @@ std::any EvalVisitor::visitMuldivmod_op(Python3Parser::Muldivmod_opContext *ctx)
 
 std::any EvalVisitor::visitTerm(Python3Parser::TermContext *ctx)
 {
-  std::any ret = visitFactor(ctx->factor()[0]);
-  for (int i = 1; i < ctx->factor().size(); ++i)
+  auto factor = ctx->factor();
+  auto muldivmod_op = ctx->muldivmod_op();
+  std::any ret = visitFactor(factor[0]);
+  for (int i = 1; i < factor.size(); ++i)
   {
-    auto tmp = visitFactor(ctx->factor()[i]);
+    auto tmp = visitFactor(factor[i]);
     int op = std::any_cast<python_consts::kterm_op>
-            (visitMuldivmod_op(ctx->muldivmod_op()[i - 1]));
+            (visitMuldivmod_op(muldivmod_op[i - 1]));
     switch (op)
     {
       case python_consts::MUL: ret = ret * tmp; break;
@@ -157,12 +162,14 @@ std::any EvalVisitor::visitAddorsub_op(Python3Parser::Addorsub_opContext *ctx)
 
 std::any EvalVisitor::visitArith_expr(Python3Parser::Arith_exprContext *ctx)
 {
-  std::any ret = visitTerm(ctx->term()[0]);
-  for (int i = 1; i < ctx->term().size(); ++i)
+  auto term = ctx->term();
+  auto addorsub_op = ctx->addorsub_op();
+  std::any ret = visitTerm(term[0]);
+  for (int i = 1; i < term.size(); ++i)
   {
-    auto tmp = visitTerm(ctx->term()[i]);
+    auto tmp = visitTerm(term[i]);
     int op = std::any_cast<python_consts::karith_op>
-            (visitAddorsub_op(ctx->addorsub_op()[i - 1]));
+            (visitAddorsub_op(addorsub_op[i - 1]));
     switch (op)
     {
       case python_consts::ADD: ret = ret + tmp; break;
@@ -210,12 +217,13 @@ std::any EvalVisitor::visitComp_op(Python3Parser::Comp_opContext *ctx)
 
 std::any EvalVisitor::visitAnd_test(Python3Parser::And_testContext *ctx)
 {
-  auto cur = visitNot_test(ctx->not_test()[0]);
-  if (ctx->not_test().size() == 1) return cur;
+  auto not_test = ctx->not_test();
+  auto cur = visitNot_test(not_test[0]);
+  if (not_test.size() == 1) return cur;
   if (!ToBool(cur)) return cur;
-  for (int i = 1; i < ctx->not_test().size(); ++i)
+  for (int i = 1; i < not_test.size(); ++i)
   {
-    cur = cur & visitNot_test(ctx->not_test()[i]);
+    cur = cur & visitNot_test(not_test[i]);
     if (!ToBool(cur)) return cur;
   }
   return cur;
@@ -223,12 +231,13 @@ std::any EvalVisitor::visitAnd_test(Python3Parser::And_testContext *ctx)
 
 std::any EvalVisitor::visitOr_test(Python3Parser::Or_testContext *ctx)
 {
-  auto cur = visitAnd_test(ctx->and_test()[0]);
+  auto and_test = ctx->and_test();
+  auto cur = visitAnd_test(and_test[0]);
   if (ctx->and_test().size() == 1) return cur;
   if (ToBool(cur)) return cur;
-  for (int i = 1; i < ctx->and_test().size(); ++i)
+  for (int i = 1; i < and_test.size(); ++i)
   {
-    cur = cur | visitAnd_test(ctx->and_test()[i]);
+    cur = cur | visitAnd_test(and_test[i]);
     if (ToBool(cur)) return cur;
   }
   return cur;
@@ -247,14 +256,15 @@ std::any EvalVisitor::visitAugassign(Python3Parser::AugassignContext *ctx)
 
 std::any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx)
 {
+  auto testlist = ctx->testlist();
   if (ctx->augassign())
   {
     auto val = visitAugassign(ctx->augassign());
     auto op = std::any_cast<python_consts::kaug_assign>(val);
     auto x = std::any_cast<std::pair<bool, std::any>>
-                           (visitTestlist(ctx->testlist()[0])).second;
+                           (visitTestlist(testlist[0])).second;
     auto var = std::any_cast<std::any*>(x);
-    auto y = visitTestlist(ctx->testlist()[1]);
+    auto y = visitTestlist(testlist[1]);
     ToRightVal(y);
     switch (op)
     {
@@ -269,18 +279,18 @@ std::any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx)
   }
   else
   {
-    int len = ctx->testlist().size();
-    auto val = visitTestlist(ctx->testlist()[len - 1]);
+    int len = testlist.size();
+    auto val = visitTestlist(testlist[len - 1]);
     ToRightVal(val);
     if (len == 1) return val;
     for (int i = len - 2; i >= 0; --i)
     {
-      auto tmp = visitTestlist(ctx->testlist()[i]);
+      auto tmp = visitTestlist(testlist[i]);
       if (!GetVar(tmp) && !GetTuple(tmp)) assert(false);
       if (GetTuple(tmp) && GetTuple(val))
       {
-        auto v1 = std::any_cast<std::vector<std::any>>(tmp);
-        auto v2 = std::any_cast<std::vector<std::any>>(val);
+        auto v1 = std::move(std::any_cast<std::vector<std::any>>(tmp));
+        auto v2 = std::move(std::any_cast<std::vector<std::any>>(val));
         if (v1.size() != v2.size()) assert(false);
         for (int j = 0; j < v1.size(); ++j)
         {
@@ -309,7 +319,8 @@ std::any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx)
         {
           auto name = std::any_cast<std::string>(var.second);
           var_scope.RegisterVar(name, val);
-        } else { *GetVarAddr(tmp) = val; }
+        }
+        else { *GetVarAddr(tmp) = val; }
       }
     }
     return val;
@@ -318,13 +329,15 @@ std::any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx)
 
 std::any EvalVisitor::visitComparison(Python3Parser::ComparisonContext *ctx)
 {
-  std::any lhs = visitArith_expr(ctx->arith_expr()[0]);
-  if (ctx->arith_expr().size() == 1) return lhs;
-  for (int i = 1; i < ctx->arith_expr().size(); ++i)
+  auto arith_expr = ctx->arith_expr();
+  auto comp_op = ctx->comp_op();
+  std::any lhs = visitArith_expr(arith_expr[0]);
+  if (arith_expr.size() == 1) return lhs;
+  for (int i = 1; i < arith_expr.size(); ++i)
   {
-    std::any rhs = visitArith_expr(ctx->arith_expr()[i]);
+    std::any rhs = visitArith_expr(arith_expr[i]);
     int op = std::any_cast<python_consts::kcomp_op>
-            (visitComp_op(ctx->comp_op()[i - 1]));
+            (visitComp_op(comp_op[i - 1]));
     bool ret;
     switch (op)
     {
@@ -354,7 +367,8 @@ std::any EvalVisitor::visitContinue_stmt(Python3Parser::Continue_stmtContext *ct
 
 std::any EvalVisitor::visitReturn_stmt(Python3Parser::Return_stmtContext *ctx)
 {
-  auto ret = ctx->testlist()? visitTestlist(ctx->testlist()):std::any();
+  auto testlist = ctx->testlist();
+  auto ret = testlist? visitTestlist(testlist):std::any();
   ToRightVal(ret);
   return std::make_pair(python_consts::RETURN, std::any(ret));
 }
@@ -378,19 +392,21 @@ std::any EvalVisitor::visitSuite(Python3Parser::SuiteContext *ctx)
 
 std::any EvalVisitor::visitIf_stmt(Python3Parser::If_stmtContext *ctx)
 {
+  auto test = ctx->test();
+  auto suite = ctx->suite();
   bool enter_if = false;
-  for (int i = 0; i < ctx->test().size(); ++i)
+  for (int i = 0; i < test.size(); ++i)
   {
-    if (ToBool(visitTest(ctx->test()[i])))
+    if (ToBool(visitTest(test[i])))
     {
-      auto ret = visitSuite(ctx->suite()[i]);
+      auto ret = visitSuite(suite[i]);
       enter_if = true;
       if (GetFlow(ret) && GetFlowInfo(ret) != python_consts::END) return ret;
     }
   }
   if (ctx->ELSE() && !enter_if)
   {
-    auto ret = visitSuite(ctx->suite()[ctx->suite().size() - 1]);
+    auto ret = visitSuite(suite[suite.size() - 1]);
     if (GetFlow(ret) && GetFlowInfo(ret) != python_consts::END) return ret;
   }
   return std::any();

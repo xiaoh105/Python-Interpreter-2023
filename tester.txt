@@ -1,7 +1,7 @@
 #!/bin/bash
 for i in {0..13}
 do
-   ./cmake-build-debug/code < "testcases/basic-testcases/test$i.in" > "ans.txt"
+   time ./cmake-build-debug/code < "testcases/basic-testcases/test$i.in" > "ans.txt"
    diff -b -Z "testcases/basic-testcases/test$i.out" "ans.txt"
    if [ $? -eq 0 ]
    then
