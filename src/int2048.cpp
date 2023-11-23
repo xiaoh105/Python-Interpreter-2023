@@ -641,8 +641,7 @@ sjtu::int2048 &sjtu::int2048::operator/=(const sjtu::int2048 &val)
   int2048 dividend = *this;
   int new_sgn = 1;
   if (sgn != val.sgn) new_sgn = -1;
-  if (val.len > 20) UnsignedDivide(val);
-  else UnsignedShortDivide(val);
+  UnsignedDivide(val);
   sgn = new_sgn;
   if (*this < 0 && dividend - *this * val != 0) *this -= 1;
   if (len == 1 && a[0] == 0) sgn = 1;
