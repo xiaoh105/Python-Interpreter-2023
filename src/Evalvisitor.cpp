@@ -59,7 +59,7 @@ std::any EvalVisitor::visitFuncdef(Python3Parser::FuncdefContext *ctx)
   {
     auto ret = visitor.visitTypedargslist(ctx->parameters()->typedargslist());
     auto init_args =
-            std::any_cast<std::vector<std::pair<std::string, std::any>>>(ret);
+            *std::any_cast<std::vector<std::pair<std::string, std::any>>>(&ret);
     func_scope.DefFunc(ctx->NAME()->getText(), init_args, ctx->suite());
   }
   else
@@ -78,8 +78,8 @@ std::any EvalVisitor::visitArgument(Python3Parser::ArgumentContext *ctx)
     auto tmp = visitTest(test[1]);
     if (GetVar(tmp))
     {
-      tmp = *std::any_cast<std::any*>
-              (std::any_cast<std::pair<bool, std::any>>(tmp).second);
+      tmp = **std::any_cast<std::any*>
+              (&std::any_cast<std::pair<bool, std::any>>(&tmp)->second);
     }
     return tmp;
   }
@@ -88,8 +88,8 @@ std::any EvalVisitor::visitArgument(Python3Parser::ArgumentContext *ctx)
     auto tmp = visitTest(test[0]);
     if (GetVar(tmp))
     {
-      tmp = *std::any_cast<std::any*>
-              (std::any_cast<std::pair<bool, std::any>>(tmp).second);
+      tmp = **std::any_cast<std::any*>
+              (&std::any_cast<std::pair<bool, std::any>>(&tmp)->second);
     }
     return tmp;
   }
@@ -260,10 +260,10 @@ std::any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx)
   if (ctx->augassign())
   {
     auto val = visitAugassign(ctx->augassign());
-    auto op = std::any_cast<python_consts::kaug_assign>(val);
+    auto op = *std::any_cast<python_consts::kaug_assign>(&val);
     auto x = std::any_cast<std::pair<bool, std::any>>
                            (visitTestlist(testlist[0])).second;
-    auto var = std::any_cast<std::any*>(x);
+    auto var = *std::any_cast<std::any*>(&x);
     auto y = visitTestlist(testlist[1]);
     ToRightVal(y);
     switch (op)
@@ -289,15 +289,15 @@ std::any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx)
       if (!GetVar(tmp) && !GetTuple(tmp)) assert(false);
       if (GetTuple(tmp) && GetTuple(val))
       {
-        auto v1 = std::move(std::any_cast<std::vector<std::any>>(tmp));
-        auto v2 = std::move(std::any_cast<std::vector<std::any>>(val));
+        auto v1 = *std::any_cast<std::vector<std::any>>(&tmp);
+        auto v2 = *std::any_cast<std::vector<std::any>>(&val);
         if (v1.size() != v2.size()) assert(false);
         for (int j = 0; j < v1.size(); ++j)
         {
-          auto var = std::any_cast<std::pair<bool, std::any>>(v1[j]);
+          auto var = *std::any_cast<std::pair<bool, std::any>>(&v1[j]);
           if (!var.first)
           {
-            auto name = std::any_cast<std::string>(var.second);
+            auto name = *std::any_cast<std::string>(&var.second);
             var = std::any_cast<std::pair<bool, std::any>>
                   (var_scope.QueryVar(name));
             if (var.first)
@@ -314,10 +314,10 @@ std::any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx)
       }
       else
       {
-        auto var = std::any_cast<std::pair<bool, std::any>>(tmp);
+        auto var = *std::any_cast<std::pair<bool, std::any>>(&tmp);
         if (!var.first)
         {
-          auto name = std::any_cast<std::string>(var.second);
+          auto name = *std::any_cast<std::string>(&var.second);
           var_scope.RegisterVar(name, val);
         }
         else { *GetVarAddr(tmp) = val; }

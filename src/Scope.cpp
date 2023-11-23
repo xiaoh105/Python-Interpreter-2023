@@ -85,7 +85,7 @@ void AtomFuncScope::GetArglist(Python3Parser::ArglistContext *ctx,
       auto tmp = visitor.visitTest(i->test()[0]);
       ToRightVal(tmp);
       auto tmp_var = cur_scope.QueryVar(var[num].first).second;
-      auto cur_var  = std::any_cast<std::any*>(tmp_var);
+      auto cur_var  = *std::any_cast<std::any*>(&tmp_var);
       *cur_var = tmp;
     }
     else
@@ -151,5 +151,5 @@ std::any FuncScope::CallFunc
   if (!func_id[name]) assert(false);
   auto ret =  func_scope[func_id[name]]->CallFunc(arglist);
   return std::any_cast<std::pair<python_consts::kflow_info, std::any>>
-         (ret).second;
+         (&ret)->second;
 }
