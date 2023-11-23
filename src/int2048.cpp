@@ -314,6 +314,7 @@ double sjtu::int2048::ToDouble() const
     ret += pow10 * a[i];
     pow10 *= 1.0 * base;
   }
+  if (sgn < 0) ret *= -1.0;
   return ret;
 }
 
@@ -356,10 +357,8 @@ sjtu::int2048 &sjtu::int2048::operator<<=(int val)
 
 sjtu::int2048 &sjtu::int2048::operator>>=(int val)
 {
-  int *new_a = new int [len - val + 5];
-  for (int i = val; i < len; ++i) new_a[i - val] = a[i];
-  delete [] a;
-  a = new_a;
+  for (int i = val; i < len; ++i) a[i - val] = a[i];
+  for (int i = len - val; i < len; ++i) a[i] = 0;
   len -= val;
   return *this;
 }
