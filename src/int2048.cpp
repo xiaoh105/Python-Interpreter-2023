@@ -691,7 +691,7 @@ sjtu::int2048 &sjtu::int2048::UnsignedDivide(const sjtu::int2048 &val)
   int2048 inv(GetInv(divisor, divisor.len));
   Adjust(int2048(1) << 2 * divisor.len, divisor, inv, 1e8);
   int2048 ans = (*this * inv) >> (2 * divisor.len);
-  Adjust(*this, divisor, ans, 1e8);
+  Adjust(*this, divisor, ans, 1e4);
   return *this = ans;
 }
 
