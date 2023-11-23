@@ -48,7 +48,7 @@ python_consts::ktype GetType(const std::any &x)
   {
     return python_consts::VAR;
   }
-  else { std::exit(401); }
+  else { assert(false); }
 }
 
 bool GetFloat(const std::any &x)
@@ -88,7 +88,7 @@ bool GetVar(const std::any &x)
 
 std::any* GetVarAddr(const std::any &x)
 {
-  if (!GetVar(x)) std::exit(402);
+  if (!GetVar(x)) assert(false);
   auto tmp = std::any_cast<std::pair<bool, std::any>>(x).second;
   return std::any_cast<std::any*>(tmp);
 }
@@ -100,7 +100,7 @@ bool GetFlow(const std::any &x)
 
 python_consts::kflow_info GetFlowInfo(const std::any &x)
 {
-  if (!GetFlow(x)) std::exit(403);
+  if (!GetFlow(x)) assert(false);
   auto tmp = std::any_cast<std::pair<python_consts::kflow_info, std::any>>(x);
   return tmp.first;
 }

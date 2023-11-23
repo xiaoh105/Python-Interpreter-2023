@@ -1,6 +1,7 @@
 #include <vector>
 #include <any>
 #include <cassert>
+#include <exception>
 #include <int2048.h>
 #include <Constant.h>
 #include <BuiltinFuncs.h>
@@ -28,7 +29,7 @@ std::any operator+(const std::any &a)
   ToRightVal(x);
   if (GetType(x) == python_consts::STR || GetType(x) == python_consts::TUPLE)
   {
-    std::exit(101);
+    assert(false);
   }
   else if (GetType(x) == python_consts::BOOL)
   {
@@ -47,7 +48,7 @@ std::any operator-(const std::any &a)
   ToRightVal(x);
   if (GetType(x) == python_consts::STR || GetType(x) == python_consts::TUPLE)
   {
-    std::exit(102);
+    assert(false);
   }
   else if (GetType(x) == python_consts::FLOAT)
   {
@@ -66,7 +67,7 @@ std::any operator-(const std::any &a)
   }
   else
   {
-    std::exit(103);
+    assert(false);
   }
 }
 
@@ -79,7 +80,7 @@ std::any operator+(const std::any &a, const std::any &b)
     if (x.type() != y.type())
     {
       std::cerr << "Str + Int/Float/Double not supported" << std::endl;
-      std::exit(104);
+      assert(false);
     }
     std::string s1, s2;
     s1 = std::any_cast<std::string>(x);
@@ -108,7 +109,7 @@ std::any operator-(const std::any &a, const std::any &b)
   if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
   {
     std::cerr <<  "Str do no support op -" << std::endl;
-    std::exit(105);
+    assert(false);
   }
   else
   {
@@ -134,7 +135,7 @@ std::any operator*(const std::any &a, const std::any &b)
     if (GetType(y) == python_consts::STR)
     {
       std::cerr << "Str * Str not supported" << std::endl;
-      std::exit(106);
+      assert(false);
     }
     std::string ret, s;
     s = std::any_cast<std::string>(x);
@@ -147,7 +148,7 @@ std::any operator*(const std::any &a, const std::any &b)
     if (GetType(x) == python_consts::STR)
     {
       std::cerr << "Str * Str not supported" << std::endl;
-      exit(107);
+      assert(false);
     }
     std::string ret, s;
     s = std::any_cast<std::string>(y);
@@ -177,7 +178,7 @@ std::any operator/(const std::any &a, const std::any &b)
   if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
   {
     std::cerr << "Str do not support op /" << std::endl;
-    std::exit(108);
+    assert(false);
   }
   else
   {
@@ -192,7 +193,7 @@ std::any IDiv(const std::any &a, const std::any &b)
   if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
   {
     std::cerr << "Str do not support op //" << std::endl;
-    std::exit(109);
+    assert(false);
   }
   else
   {
@@ -212,7 +213,7 @@ std::any operator%(const std::any &a, const std::any &b)
   if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
   {
     std::cerr << "Str do not support op %" << std::endl;
-    std::exit(110);
+    assert(false);
   }
   else
   {
@@ -239,7 +240,7 @@ bool operator<(const std::any &a, const std::any &b)
     if (GetType(x) != GetType(y))
     {
       std::cerr << "Str cmp_op Int/Float/Bool do no support!" << std::endl;
-      std::exit(111);
+      assert(false);
     }
     std::string s1, s2;
     s1 = std::any_cast<std::string>(x);
@@ -297,7 +298,7 @@ bool operator>(const std::any &a, const std::any &b)
     if (GetType(x) != GetType(y))
     {
       std::cerr << "Str cmp_op Int/Float/Bool do no support!" << std::endl;
-      std::exit(112);
+      assert(false);
     }
     std::string s1, s2;
     s1 = std::any_cast<std::string>(x);
