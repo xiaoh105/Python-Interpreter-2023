@@ -288,7 +288,16 @@ std::any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx)
           if (!var.first)
           {
             auto name = std::any_cast<std::string>(var.second);
-            var_scope.RegisterVar(name, v2[j]);
+            var = std::any_cast<std::pair<bool, std::any>>
+                  (var_scope.QueryVar(name));
+            if (var.first)
+            {
+              *GetVarAddr(var) = v2[j];
+            }
+            else
+            {
+              var_scope.RegisterVar(name, v2[j]);
+            }
           }
           else { *GetVarAddr(v1[j]) = v2[j]; }
         }
