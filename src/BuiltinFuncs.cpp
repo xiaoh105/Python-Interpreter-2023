@@ -32,11 +32,7 @@ sjtu::int2048 ToInt(const std::any &x)
     auto x = std::any_cast<double>(val);
     return (long long) x;
   }
-  else
-  {
-    std::cerr << "Current data can't be converted to int." << std::endl;
-    assert(false);
-  }
+  else { assert(false); }
 }
 
 double ToFloat(const std::any &x)
@@ -64,11 +60,7 @@ double ToFloat(const std::any &x)
     if (!IsNumber(s)) assert(false);
     return std::stod(s);
   }
-  else
-  {
-    std::cerr << "Current data can't be converted to float." << std::endl;
-    assert(false);
-  }
+  else { assert(false); }
 }
 
 std::string ToString(const std::any &x)
@@ -98,11 +90,7 @@ std::string ToString(const std::any &x)
     oss << x;
     return oss.str();
   }
-  else
-  {
-    std::cerr << "Current data can't be converted to string." << std::endl;
-    assert(false);
-  }
+  else { assert(false); }
 }
 
 bool ToBool(const std::any &x)
@@ -129,13 +117,7 @@ bool ToBool(const std::any &x)
     auto s = std::any_cast<std::string>(val);
     return s.empty();
   }
-  else
-  {
-    {
-      std::cerr << "Current data can't be converted to bool." << std::endl;
-      assert(false);
-    }
-  }
+  else { assert(false); }
 }
 
 void PrintAtom(const std::any &val)
@@ -173,11 +155,7 @@ void PrintAtom(const std::any &val)
       if (i != x.size() - 1) printf(" ");
     }
   }
-  else
-  {
-    std::cerr << "Current type doesn't support print()" << std::endl;
-    assert(false);
-  }
+  else { assert(false); }
 }
 
 void Print(const std::vector<std::pair<std::string, std::any>> &val)
