@@ -551,7 +551,7 @@ sjtu::int2048 sjtu::operator*(sjtu::int2048 x, long long y) {
 void sjtu::Adjust(const int2048 &dividend, const int2048 &divisor,
                   int2048 &quotient, long long max_delta)
 {
-  int2048 remainder = dividend - divisor * quotient;
+  int2048 remainder = minus(dividend, divisor * quotient);
   long long left = -max_delta - 1, right = max_delta + 1;
   while (left + 1 < right)
   {
@@ -560,7 +560,7 @@ void sjtu::Adjust(const int2048 &dividend, const int2048 &divisor,
     else { left = mid; }
   }
   quotient += int2048(left);
-  if (dividend - divisor * (quotient + 1) >= 0) quotient += int2048(1);
+  if (dividend >= divisor * (quotient + 1)) quotient += int2048(1);
 }
 
 sjtu::int2048 sjtu::GetInv(const sjtu::int2048 &val, int len)
@@ -620,8 +620,8 @@ sjtu::int2048 &sjtu::int2048::UnsignedDivide(const sjtu::int2048 &val)
   if (len > 2 * val.len)
   {
     int delta = len - 2 * val.len;
-    *this = (*this << delta);
-    divisor = (divisor << delta);
+    *this <<= delta;
+    divisor <<= delta;
   }
   int2048 inv(GetInv(divisor, divisor.len));
   Adjust(int2048(1) << (2 * divisor.len), divisor, inv, 1e8);
