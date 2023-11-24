@@ -402,6 +402,7 @@ std::any EvalVisitor::visitIf_stmt(Python3Parser::If_stmtContext *ctx)
       auto ret = visitSuite(suite[i]);
       enter_if = true;
       if (GetFlow(ret) && GetFlowInfo(ret) != python_consts::END) return ret;
+      break;
     }
   }
   if (ctx->ELSE() && !enter_if)
