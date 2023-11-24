@@ -14,44 +14,44 @@ std::any operator+(const std::any &);
 
 std::any operator-(const std::any &);
 
-std::any operator+(const std::any &x, const std::any &y);
+std::any operator+(const std::any &, const std::any &);
 
-std::any operator-(const std::any &x, const std::any &y);
+std::any operator-(const std::any &, const std::any &);
 
-std::any operator*(const std::any &x, const std::any &y);
+std::any operator*(const std::any &, const std::any &);
 
-std::any operator/(const std::any &x, const std::any &y);
+std::any operator/(const std::any &, const std::any &);
 
-std::any IDiv(const std::any &x, const std::any &y);
+std::any IDiv(const std::any &, const std::any &);
 
-std::any operator%(const std::any &x, const std::any &y);
+std::any operator%(const std::any &, const std::any &);
 
-std::any &operator+=(std::any &x, const std::any &y);
+std::any &operator+=(std::any &, const std::any &);
 
-std::any &operator-=(std::any &x, const std::any &y);
+std::any &operator-=(std::any &, const std::any &);
 
-std::any &operator*=(std::any &x, const std::any &y);
+std::any &operator*=(std::any &, const std::any &);
 
-std::any &operator/=(std::any &x, const std::any &y);
+std::any &operator/=(std::any &, const std::any &);
 
-std::any &operator%=(std::any &x, const std::any &y);
+std::any &operator%=(std::any &, const std::any &);
 
-bool operator<(const std::any &x, const std::any &y);
+bool operator<(const std::any &, const std::any &);
 
-bool operator==(const std::any &x, const std::any &y);
+bool operator==(const std::any &, const std::any &);
 
-bool operator>(const std::any &x, const std::any &y);
+bool operator>(const std::any &, const std::any &);
 
-bool operator<=(const std::any &x, const std::any &y);
+bool operator<=(const std::any &, const std::any &);
 
-bool operator>=(const std::any &x, const std::any &y);
+bool operator>=(const std::any &, const std::any &);
 
-bool operator!=(const std::any &x, const std::any &y);
+bool operator!=(const std::any &, const std::any &);
 
-bool operator!(const std::any &x);
+bool operator!(const std::any &);
 
-std::any operator&(const std::any &x, const std::any &y);
+std::any operator&(const std::any &, const std::any &);
 
-std::any operator|(const std::any &x, const std::any &y);
+std::any operator|(const std::any &, const std::any &);
 
 #endif //PYTHON_INTERPRETER_VAROPERATOR_H

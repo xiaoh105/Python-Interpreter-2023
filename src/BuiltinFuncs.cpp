@@ -119,7 +119,7 @@ bool ToBool(const std::any &x)
   else if (val.type() == typeid(std::string))
   {
     auto s = *std::any_cast<std::string>(&val);
-    return s.empty();
+    return !s.empty();
   }
   else if (GetNone(val))
   {
