@@ -608,31 +608,34 @@ sjtu::int2048 &sjtu::int2048::UnsignedDivide(const sjtu::int2048 &val)
 {
   int2048 ret;
   sgn = 1;
+  int2048 r(*this);
   if (*this < val) return *this = 0;
   ret.a.resize(a.size() - val.a.size() + 1);
-  double t = val.a[val.a.size() - 2] + (val.a[val.a.size() - 3] + 1.0) / base;
+  double t = val.get(val.a.size() - 2) +
+             (val.get(val.a.size() - 3) + 1.0) / base;
   double db = 1.0 / (val.a.back() + t / base);
   for (int i = a.size() - 1, j = ret.a.size() - 1; j <= a.size();)
   {
-    int rm = a[i + 1] * base + a[i];
-    int m = std::max((int)(db * rm), a[i + 1]);
-    UnsignedShortDivide(val, m, j);
+    int rm = r.get(i + 1) * base + r.get(i);
+    int m = std::max((int)(db * rm), r.get(i + 1));
+    r.UnsignedShortDivide(val, m, j);
     ret.a[j] += m;
-    if (!a[i + 1]) --i, --j;
+    if (!r.get(i + 1)) --i, --j;
   }
-  while (len >= 2 && a[len - 1] == 0) a.pop_back(), --len;
+  r.len = r.a.size();
+  while (r.len >= 2 && r.a[r.len - 1] == 0) r.a.pop_back(), --r.len;
   int carry = 0;
-  while (!(abs(*this) < val))
+  while (!(abs(r) < val))
   {
-    *this -= val;
+    r -= val;
     ++carry;
   }
-  // 修正每一位的进位
   for (int i = 0; i < ret.a.size(); ++i) {
     carry += ret.a[i];
     ret.a[i] = carry % base;
     carry /= base;
   }
+  ret.len = ret.a.size();
   while (ret.len >= 2 && ret.a[ret.len - 1] == 0) ret.a.pop_back(), --ret.len;
   return *this = ret;
 }

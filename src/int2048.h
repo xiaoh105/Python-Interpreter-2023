@@ -64,6 +64,10 @@ namespace sjtu
     const static int base_log10 = 4; // 压位的位数
     int len; // 数字长度，不包含前缀0
     vector<int> a; // 储存数据，0-based, 低位存在0
+    int get(int pos) const
+    {
+      return pos >= a.size() || pos < 0? 0:a[pos];
+    }
     /// 无符号加法
     friend int2048 UnsignedAdd(const int2048 &, const int2048 &);
     /// 无符号减法
