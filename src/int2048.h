@@ -75,7 +75,7 @@ namespace sjtu
     friend int2048 GetInv(const int2048 &, int);
     /// 无符号除法
     int2048 &UnsignedDivide(const int2048 &);
-    int2048 &UnsignedShortDivide(const int2048 &);
+    int2048 &UnsignedShortDivide(const int2048 &, int, int);
     /// 将当前整数*(base^x)（左移一个block)
     int2048 &operator<<=(int);
     /// 将当前整数/(base^x)（右移一个block)

@@ -584,52 +584,57 @@ sjtu::int2048 sjtu::GetInv(const sjtu::int2048 &val, int len)
   return ans;
 }
 
-sjtu::int2048 &sjtu::int2048::UnsignedShortDivide(const sjtu::int2048 &val)
+sjtu::int2048 &sjtu::int2048::UnsignedShortDivide
+(const sjtu::int2048 &val, int mul, int offset)
 {
-  sgn = 1;
-  auto tmp(abs(val));
-  if (val > *this) return *this = 0;
-  sjtu::int2048 ans;
-  ans.a.resize(len - val.len + 1), ans.len = len - val.len + 1;
-  int2048 remainder = *this >> (len - val.len + 1);
-  for (int i = len - val.len; i >= 0; --i)
+  if (mul == 0) return *this;
+  int borrow = 0;
+  for (int i = 0; i < val.a.size(); ++i)
   {
-    remainder = remainder * base + a[i];
-    if (remainder < tmp) { ans.a[i] = 0; }
-    else
-    {
-      int l = 0, r = base;
-      while (l + 1 < r)
-      {
-        int mid = (l + r) >> 1;
-        if (tmp * mid > remainder) r = mid;
-        else l = mid;
-      }
-      if ((l + 1) * tmp <= remainder) ++l;
-      ans.a[i] = l;
-      remainder = UnsignedMinus(remainder, l * tmp);
-    }
+    borrow += a[i + offset] - val.a[i] * mul - base + 1;
+    a[i + offset] = borrow % base + base - 1;
+    borrow /= base;
   }
-  while (ans.len >= 2 && ans.a.back() == 0) ans.a.pop_back(), --ans.len;
-  return *this = std::move(ans);
+  for (int i = val.a.size(); borrow; ++i)
+  {
+    borrow += a[i + offset] - base + 1;
+    a[i + offset] = borrow % base + base - 1;
+    borrow /= base;
+  }
+  return *this;
 }
 
 sjtu::int2048 &sjtu::int2048::UnsignedDivide(const sjtu::int2048 &val)
 {
-  sjtu::int2048 divisor(abs(val));
+  int2048 ret;
   sgn = 1;
-  if (*this < divisor) return *this = 0;
-  if (len > 2 * val.len)
+  if (*this < val) return *this = 0;
+  ret.a.resize(a.size() - val.a.size() + 1);
+  double t = val.a[val.a.size() - 2] + (val.a[val.a.size() - 3] + 1.0) / base;
+  double db = 1.0 / (val.a.back() + t / base);
+  for (int i = a.size() - 1, j = ret.a.size() - 1; j <= a.size();)
   {
-    int delta = len - 2 * val.len;
-    *this <<= delta;
-    divisor <<= delta;
+    int rm = a[i + 1] * base + a[i];
+    int m = std::max((int)(db * rm), a[i + 1]);
+    UnsignedShortDivide(val, m, j);
+    ret.a[j] += m;
+    if (!a[i + 1]) --i, --j;
   }
-  int2048 inv(GetInv(divisor, divisor.len));
-  Adjust(int2048(1) << (2 * divisor.len), divisor, inv, 1e8);
-  int2048 ans = (inv.UnsignedMul(*this)) >> (2 * divisor.len);
-  Adjust(*this, divisor, ans, 1e4);
-  return *this = ans;
+  while (len >= 2 && a[len - 1] == 0) a.pop_back(), --len;
+  int carry = 0;
+  while (!(abs(*this) < val))
+  {
+    *this -= val;
+    ++carry;
+  }
+  // 修正每一位的进位
+  for (int i = 0; i < ret.a.size(); ++i) {
+    carry += ret.a[i];
+    ret.a[i] = carry % base;
+    carry /= base;
+  }
+  while (ret.len >= 2 && ret.a[ret.len - 1] == 0) ret.a.pop_back(), --ret.len;
+  return *this = ret;
 }
 
 sjtu::int2048 &sjtu::int2048::operator/=(const sjtu::int2048 &val)
@@ -638,8 +643,7 @@ sjtu::int2048 &sjtu::int2048::operator/=(const sjtu::int2048 &val)
   int2048 dividend = *this;
   int new_sgn = 1;
   if (sgn != val.sgn) new_sgn = -1;
-  if (val.len > 20) UnsignedDivide(val);
-  else UnsignedShortDivide(val);
+  UnsignedDivide(abs(val));
   sgn = new_sgn;
   if (*this < 0 && dividend.minus(*this * val) != 0) *this -= 1;
   if (len == 1 && a[0] == 0) sgn = 1;
