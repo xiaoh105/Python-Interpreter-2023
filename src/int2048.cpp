@@ -35,9 +35,10 @@ void sjtu::polynomial::ChangeIndex()
   delete [] rev;
 }
 
-__int128 sjtu::pow_mod(__int128 base, __int128 pow)
+long long sjtu::pow_mod(long long base, long long pow)
 {
-  __int128 ret = 1, cur_pow = base;
+  __int128 ret = 1;
+  __int128 cur_pow = base;
   while (pow > 0)
   {
     if (pow & 1)
@@ -51,7 +52,7 @@ __int128 sjtu::pow_mod(__int128 base, __int128 pow)
   return ret;
 }
 
-void sjtu::Extend_GCD(__int128 a, __int128 b, __int128 &x, __int128 &y)
+void sjtu::Extend_GCD(long long a, long long b, long long &x, long long &y)
 {
   if (b == 0)
   {
@@ -62,9 +63,9 @@ void sjtu::Extend_GCD(__int128 a, __int128 b, __int128 &x, __int128 &y)
   y -= x * (a / b);
 }
 
-__int128 sjtu::inverse(__int128 a)
+long long sjtu::inverse(long long a)
 {
-  __int128 x, y;
+  long long x, y;
   Extend_GCD(a, sjtu::polynomial::mod, x, y);
   x %= sjtu::polynomial::mod;
   if (x < 0) x += sjtu::polynomial::mod;
@@ -85,7 +86,7 @@ void sjtu::polynomial::NTT(int is_NTT)
       int j = i + (step >> 1);
       for (int k = 0; k < (step >> 1); ++k)
       {
-        __int128 f = a[i | k], g = a[j | k] * cur_w % mod;
+        long long f = a[i | k], g = cur_w * a[j | k] % mod;
         a[i | k] = f + g;
         if (a[i | k] >= mod) a[i | k] -= mod;
         a[j | k] = f - g;
@@ -97,7 +98,7 @@ void sjtu::polynomial::NTT(int is_NTT)
   if (is_NTT == -1)
   {
     __int128 inv_len = inverse(len);
-    for (int i = 0; i < len; ++i) a[i] *= inv_len, a[i] %= mod;
+    for (int i = 0; i < len; ++i) a[i] = inv_len * a[i] % mod;
   }
 }
 
@@ -117,7 +118,7 @@ sjtu::polynomial &sjtu::polynomial::Multiply(sjtu::polynomial val)
   ExtendLen(new_len);
   val.ExtendLen(new_len);
   NTT(1), val.NTT(1);
-  for (int i = 0; i < len; ++i) a[i] *= val.a[i], a[i] %= mod;
+  for (int i = 0; i < len; ++i) a[i] = (__int128)a[i] * val.a[i] % mod;
   NTT(-1);
   return *this;
 }

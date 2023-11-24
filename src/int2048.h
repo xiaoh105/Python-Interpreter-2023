@@ -16,11 +16,11 @@ namespace sjtu
   {
   private:
     // 使用NTT计算乘法, root = 6, mod = 7 * (2 ^ 50) + 1
-    constexpr static __int128 root = 6;
-    constexpr static __int128 inv = 1313549891316395;
-    constexpr static __int128 mod = 7881299347898369;
+    constexpr static long long root = 6;
+    constexpr static long long inv = 1313549891316395;
+    constexpr static long long mod = 7881299347898369;
     int len;
-    vector<__int128> a;
+    vector<long long> a;
     /// NTT 蝶形变换, O(n)
     void ChangeIndex();
     /// 扩展多项式长度, 自动添加前缀0
@@ -30,11 +30,11 @@ namespace sjtu
     /// 对多项式进行进位处理
     void CalcCarry();
     /// 带模数的快速幂
-    friend __int128 pow_mod(__int128, __int128);
+    friend long long pow_mod(long long, long long);
     /// 扩展欧几里得算法，用于计算模数
-    friend void Extend_GCD(__int128, __int128, __int128 &, __int128 &);
+    friend void Extend_GCD(long long, long long, long long &, long long &);
     /// 求取模意义下的乘法逆元
-    friend __int128 inverse(__int128);
+    friend long long inverse(long long);
 
   public:
     friend class int2048;
