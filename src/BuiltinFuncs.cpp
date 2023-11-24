@@ -90,6 +90,10 @@ std::string ToString(const std::any &x)
     oss << x;
     return oss.str();
   }
+  else if (GetNone(val))
+  {
+    return "None";
+  }
   else { assert(false); }
 }
 
@@ -116,6 +120,10 @@ bool ToBool(const std::any &x)
   {
     auto s = *std::any_cast<std::string>(&val);
     return s.empty();
+  }
+  else if (GetNone(val))
+  {
+    return false;
   }
   else { assert(false); }
 }
