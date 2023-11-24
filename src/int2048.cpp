@@ -85,10 +85,11 @@ void sjtu::polynomial::NTT(int is_NTT)
       int j = i + (step >> 1);
       for (int k = 0; k < (step >> 1); ++k)
       {
-        __int128 f = a[i + k], g = a[j + k];
-        a[i + k] = f + cur_w * g % mod, a[i + k] %= mod;
-        a[j + k] = f - cur_w * g % mod;
-        a[j + k] = (a[j + k] % mod + mod) % mod;
+        __int128 f = a[i + k], g = a[j + k] * cur_w % mod;
+        a[i + k] = f + g;
+        if (a[i + k] >= mod) a[i + k] -= mod;
+        a[j + k] = f - g;
+        if (a[j + k] < 0) a[j + k] += mod;
         cur_w *= w, cur_w %= mod;
       }
     }
