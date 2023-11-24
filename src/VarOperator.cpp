@@ -253,6 +253,8 @@ bool operator==(const std::any &a, const std::any &b)
   {
     python_consts::ktype type_x, type_y;
     type_x = GetType(x), type_y = GetType(y);
+    if (type_x == python_consts::NONE || type_y == python_consts::NONE)
+      return type_x == type_y;
     if (std::min(type_x, type_y) == python_consts::FLOAT)
     {
       return ToFloat(x) == ToFloat(y);
