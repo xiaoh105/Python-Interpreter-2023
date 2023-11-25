@@ -1,5 +1,6 @@
 #include <cassert>
 #include <any>
+#include <iomanip>
 #include <int2048.h>
 #include <Utils.h>
 #include <Constant.h>
@@ -87,7 +88,7 @@ std::string ToString(const std::any &x)
   else if (val.type() == typeid(double))
   {
     auto x = *std::any_cast<double>(&val);
-    oss << x;
+    oss << std::fixed << std::setprecision(6) << x;
     return oss.str();
   }
   else if (GetNone(val))
