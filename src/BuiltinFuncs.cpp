@@ -84,7 +84,7 @@ std::string ToString(const std::any &x)
     auto x = *std::any_cast<bool>(&val);
     return x? "True":"False";
   }
-  else if (val.type() == typeid(float))
+  else if (val.type() == typeid(double))
   {
     auto x = *std::any_cast<double>(&val);
     oss << x;
