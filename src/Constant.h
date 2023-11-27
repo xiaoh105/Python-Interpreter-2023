@@ -1,3 +1,4 @@
+#include <any>
 #pragma once
 #ifndef PYTHON_INTERPRETER_CONSTANT_H
 #define PYTHON_INTERPRETER_CONSTANT_H
@@ -13,4 +14,7 @@ namespace python_consts
                     DIVASSIGN, IDIVASSIGN, MODASSIGN};
   enum kflow_info{ BREAK, CONTINUE, RETURN, END };
 }
+using tuple_type = std::vector<std::any>;
+using lval_type = std::pair<bool, std::any>;
+using arglist_type = std::vector<std::pair<std::string, std::any>>;
 #endif //PYTHON_INTERPRETER_CONSTANT_H

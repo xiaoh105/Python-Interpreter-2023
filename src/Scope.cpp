@@ -4,7 +4,7 @@
 #include "Evalvisitor.h"
 #include <VarOperator.h>
 
-AtomVarScope::AtomVarScope(const std::vector<std::pair<std::string, std::any>> &val)
+AtomVarScope::AtomVarScope(const arglist_type &val)
 {
   var.clear();
   for (const auto &i: val) RegisterVar(i.first, i.second);
@@ -107,7 +107,7 @@ std::any FuncScope::CallBuiltinFunc
          Python3Parser::ArglistContext *arglist)
 {
   EvalVisitor visitor;
-  std::vector<std::pair<std::string, std::any>> args;
+  arglist_type args;
   if (arglist)
     for (const auto &i: arglist->argument())
       args.emplace_back("", visitor.visitArgument(i));
@@ -137,7 +137,7 @@ std::any FuncScope::CallBuiltinFunc
 
 void FuncScope::DefFunc
 (const std::string &name,
- const std::vector<std::pair<std::string, std::any>> &def_arglist,
+ const arglist_type &def_arglist,
  Python3Parser::SuiteContext *ctx)
 {
   func_id[name] = ++num_of_func;

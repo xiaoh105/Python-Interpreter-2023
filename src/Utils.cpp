@@ -36,7 +36,7 @@ python_consts::ktype GetType(const std::any &x)
   {
     return python_consts::STR;
   }
-  else if (x.type() == typeid(std::vector<std::any>))
+  else if (x.type() == typeid(tuple_type))
   {
     return python_consts::TUPLE;
   }
@@ -44,7 +44,7 @@ python_consts::ktype GetType(const std::any &x)
   {
     return python_consts::NONE;
   }
-  else if (x.type() == typeid(std::pair<bool, std::any>))
+  else if (x.type() == typeid(lval_type))
   {
     return python_consts::VAR;
   }
@@ -89,7 +89,7 @@ bool GetVar(const std::any &x)
 std::any* GetVarAddr(const std::any &x)
 {
   if (!GetVar(x)) assert(false);
-  auto tmp = std::any_cast<std::pair<bool, std::any>>(&x)->second;
+  auto tmp = std::any_cast<lval_type>(&x)->second;
   return *std::any_cast<std::any*>(&tmp);
 }
 

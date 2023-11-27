@@ -11,12 +11,12 @@ void ToRightVal(std::any &x)
 {
   if (GetVar(x))
   {
-    auto tmp = std::any_cast<std::pair<bool, std::any>>(&x)->second;
+    auto tmp = std::any_cast<lval_type>(&x)->second;
     x = **std::any_cast<std::any*>(&tmp);
   }
   else if (GetTuple(x))
   {
-    auto val = *std::any_cast<std::vector<std::any>>(&x);
+    auto val = *std::any_cast<tuple_type>(&x);
     for (auto &i: val) ToRightVal(i);
     x = val;
   }
@@ -26,11 +26,11 @@ std::any operator+(const std::any &a)
 {
   auto x = a;
   ToRightVal(x);
-  if (GetType(x) == python_consts::STR || GetType(x) == python_consts::TUPLE)
+  if (GetStr(x) || GetTuple(x))
   {
     assert(false);
   }
-  else if (GetType(x) == python_consts::BOOL)
+  else if (GetBool(x))
   {
     auto val = *std::any_cast<bool>(&x);
     return val? sjtu::int2048(1):sjtu::int2048(0);
@@ -45,21 +45,21 @@ std::any operator-(const std::any &a)
 {
   auto x = a;
   ToRightVal(x);
-  if (GetType(x) == python_consts::STR || GetType(x) == python_consts::TUPLE)
+  if (GetStr(x) || GetTuple(x))
   {
     assert(false);
   }
-  else if (GetType(x) == python_consts::FLOAT)
+  else if (GetFloat(x))
   {
     auto val = *std::any_cast<double>(&x);
     return -val;
   }
-  else if (GetType(x) == python_consts::INT)
+  else if (GetInt(x))
   {
     auto val = *std::any_cast<sjtu::int2048>(&x);
     return -val;
   }
-  else if (GetType(x) == python_consts::BOOL)
+  else if (GetBool(x))
   {
     auto val = *std::any_cast<bool>(&x);
     return val? sjtu::int2048(-1):sjtu::int2048(0);
@@ -74,7 +74,7 @@ std::any operator+(const std::any &a, const std::any &b)
 {
   auto x = a, y = b;
   ToRightVal(x), ToRightVal(y);
-  if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
+  if (GetStr(x) || GetStr(y))
   {
     if (x.type() != y.type()) assert(false);
     auto s1 = *std::any_cast<std::string>(&x);
@@ -100,7 +100,7 @@ std::any operator-(const std::any &a, const std::any &b)
 {
   auto x = a, y = b;
   ToRightVal(x), ToRightVal(y);
-  if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
+  if (GetStr(x) || GetStr(y))
   {
     assert(false);
   }
@@ -123,18 +123,18 @@ std::any operator*(const std::any &a, const std::any &b)
 {
   auto x = a, y = b;
   ToRightVal(x), ToRightVal(y);
-  if (GetType(x) == python_consts::STR)
+  if (GetStr(x))
   {
-    if (GetType(y) == python_consts::STR) assert(false);
+    if (GetStr(y)) assert(false);
     std::string ret, s;
     s = *std::any_cast<std::string>(&x);
     sjtu::int2048 val = ToInt(y);
     for (sjtu::int2048 i = 0; i < val; i += 1) ret += s;
     return ret;
   }
-  else if (GetType(y) == python_consts::STR)
+  else if (GetStr(y))
   {
-    if (GetType(x) == python_consts::STR) assert(false);
+    if (GetStr(x)) assert(false);
     std::string ret;
     auto s = *std::any_cast<std::string>(&y);
     sjtu::int2048 val = ToInt(x);
@@ -159,7 +159,7 @@ std::any operator/(const std::any &a, const std::any &b)
 {
   auto x = a, y = b;
   ToRightVal(x), ToRightVal(y);
-  if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
+  if (GetStr(x) || GetStr(y))
   {
     assert(false);
   }
@@ -173,7 +173,7 @@ std::any IDiv(const std::any &a, const std::any &b)
 {
   auto x = a, y = b;
   ToRightVal(x), ToRightVal(y);
-  if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
+  if (GetStr(x) || GetStr(y))
   {
     assert(false);
   }
@@ -192,7 +192,7 @@ std::any operator%(const std::any &a, const std::any &b)
 {
   auto x = a, y = b;
   ToRightVal(x), ToRightVal(y);
-  if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
+  if (GetStr(x) || GetStr(y))
   {
     assert(false);
   }
@@ -216,7 +216,7 @@ bool operator<(const std::any &a, const std::any &b)
 {
   auto x = a, y = b;
   ToRightVal(x), ToRightVal(y);
-  if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
+  if (GetStr(x) || GetStr(y))
   {
     if (GetType(x) != GetType(y)) assert(false);
     auto s1 = *std::any_cast<std::string>(&x);
@@ -242,7 +242,7 @@ bool operator==(const std::any &a, const std::any &b)
 {
   auto x = a, y = b;
   ToRightVal(x), ToRightVal(y);
-  if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
+  if (GetStr(x) || GetStr(y))
   {
     if (GetType(x) != GetType(y)) return false;
     auto s1 = *std::any_cast<std::string>(&x);
@@ -253,7 +253,7 @@ bool operator==(const std::any &a, const std::any &b)
   {
     python_consts::ktype type_x, type_y;
     type_x = GetType(x), type_y = GetType(y);
-    if (type_x == python_consts::NONE || type_y == python_consts::NONE)
+    if (GetNone(x) || GetNone(y))
     {
       return type_x == type_y;
     }
@@ -272,7 +272,7 @@ bool operator>(const std::any &a, const std::any &b)
 {
   auto x = a, y = b;
   ToRightVal(x), ToRightVal(y);
-  if (GetType(x) == python_consts::STR || GetType(y) == python_consts::STR)
+  if (GetStr(x) || GetStr(y))
   {
     if (GetType(x) != GetType(y)) assert(false);
     auto s1 = *std::any_cast<std::string>(&x);
